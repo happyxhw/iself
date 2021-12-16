@@ -59,6 +59,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 			Encoder: viper.GetString("log.encoder"),
 		},
 	)
+	e.Use(middleware.Recover())
 	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 		Generator: uuid.NewString,
 	}))
