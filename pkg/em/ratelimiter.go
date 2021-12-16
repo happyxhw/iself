@@ -14,6 +14,8 @@ func IPRateLimit(store limiter.Store, rate limiter.Rate) echo.MiddlewareFunc {
 	// 2. Return middleware handler
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
+			// TODO: not login -> ip
+			// login -> user id
 			ip := c.RealIP()
 			limiterCtx, err := ipRateLimiter.Get(c.Request().Context(), ip)
 			if err != nil {

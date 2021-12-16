@@ -82,7 +82,7 @@ require (
 	git.happyxhw.cn/happyxhw/gin-starter v0.0.0-20211215051403-2c6e6215fc89
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/go-github/v41 v41.0.0
-	github.com/labstack/gommon v0.3.1 // indirect
+	github.com/labstack/gommon v0.3.1
 	github.com/stretchr/testify v1.7.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.2.1
