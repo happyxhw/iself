@@ -33,11 +33,13 @@ func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 
 			var errCode int
 			var errMsg string
-			if he, ok := err.(*Error); ok {
-				errCode = he.Code
-				errMsg = he.Error()
-			} else {
-				errMsg = err.Error()
+			if err != nil {
+				if he, ok := err.(*Error); ok {
+					errCode = he.Code
+					errMsg = he.Error()
+				} else {
+					errMsg = err.Error()
+				}
 			}
 
 			fields := []zap.Field{

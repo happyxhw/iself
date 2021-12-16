@@ -43,13 +43,19 @@ func (e *Error) Wrap(err error) *Error {
 // ErrHandler handler
 func ErrHandler(e *echo.Echo) func(err error, c echo.Context) {
 	return func(err error, c echo.Context) {
-		if he, ok := err.(*Error); ok {
+		switch v := (err).(type) {
+		case *Error:
 			if !e.Debug {
-				he.ErrorMessage = ""
+				_ = c.JSON(v.Status, Error{Code: v.Code, Message: v.Message})
+				return
 			}
-			_ = c.JSON(c.Response().Status, he)
+			_ = c.JSON(v.Status, v)
+			return
+		case *echo.HTTPError:
+			_ = c.JSON(v.Code, v)
 			return
 		}
+
 		_ = c.JSON(c.Response().Status, err)
 	}
 }

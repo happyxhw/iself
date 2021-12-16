@@ -2,20 +2,21 @@ package router
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 
-	"github.com/google/uuid"
+	"github.com/go-playground/validator"
 
+	"git.happyxhw.cn/happyxhw/iself/api/user"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"git.happyxhw.cn/happyxhw/iself/router/components"
 )
 
 // Serve start web serve
@@ -24,8 +25,8 @@ func Serve() {
 
 	// Start server
 	go func() {
-		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
-			log.Fatal("shutting down the server")
+		if err := e.Start(viper.GetString("server.addr")); err != nil && err != http.ErrServerClosed {
+			log.Fatal("shutting down the server", zap.Error(err))
 		}
 	}()
 
@@ -35,34 +36,24 @@ func Serve() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
+		log.Error("shutting down the server", zap.Error(err))
 	}
 }
 
 func newRouter() *echo.Echo {
 	e := echo.New()
-	e.Debug = true
+	e.Debug = viper.GetBool("server.debug")
+	e.HTTPErrorHandler = em.ErrHandler(e)
+	e.Validator = &em.CustomValidator{Validator: validator.New()}
+
+	components.InitComponent()
 	initGlobalMiddleware(e)
 
-	e.GET("/:id/h", func(c echo.Context) error {
-		return em.NewError(http.StatusBadRequest, 400000, "debug").Wrap(errors.New("debug-err"))
-	})
+	initRouter(e)
 
 	return e
 }
 
-func initGlobalMiddleware(e *echo.Echo) {
-	webLogger := log.NewLogger(
-		&log.Config{
-			Level:   viper.GetString("log.web.level"),
-			Path:    viper.GetString("log.web.path"),
-			Encoder: viper.GetString("log.encoder"),
-		},
-	)
-	e.Use(middleware.Recover())
-	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
-		Generator: uuid.NewString,
-	}))
-	e.HTTPErrorHandler = em.ErrHandler(e)
-	e.Use(em.Logger(webLogger))
+func initRouter(e *echo.Echo) {
+	user.InitRouter(e)
 }
