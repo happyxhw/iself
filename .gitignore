@@ -1,0 +1,13 @@
+# IDE
+.idea
+.vscode
+
+# project
+logs
+coverage.txt
+
+# binary
+iself
+
+# config
+config
