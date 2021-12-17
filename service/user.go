@@ -121,10 +121,9 @@ func (u *User) SignUp(ctx context.Context, url string, user *model.User) *em.Err
 	if errDB := u.db.Create(&user).Error; errDB != nil {
 		return em.ErrDB.Wrap(errDB)
 	}
-	err = u.SendMail(ctx, user.Email, "active", url) //nolint:staticcheck
-	//nolint:staticcheck
-	if err != nil {
-		userLogger.Error("send activate email", zap.Error(err))
+	emErr := u.SendMail(ctx, user.Email, "active", url)
+	if emErr != nil {
+		userLogger.Error("send active email", zap.Error(err))
 	}
 	return nil
 }
