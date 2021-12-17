@@ -36,7 +36,7 @@ var (
 	// ErrUserExists 需要注册的用户已经存在了
 	ErrUserExists = em.NewError(http.StatusConflict, 40101, "email exists")
 	// ErrUserSignIn 用户名或密码错误
-	ErrUserSignIn = em.NewError(http.StatusBadRequest, 40102, "username or password incorrect")
+	ErrUserSignIn = em.NewError(http.StatusUnauthorized, 40102, "username or password incorrect")
 	// ErrOauth2Source 未知的 oauth2 认证源
 	ErrOauth2Source = em.NewError(http.StatusBadRequest, 40103, "unknown oauth2 source")
 	// ErrOauth2State oauth2 state 校验失败
