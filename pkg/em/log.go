@@ -68,7 +68,7 @@ func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 				logger.Info("[API]", fields...)
 			}
 
-			return nil
+			return err
 		}
 	}
 }

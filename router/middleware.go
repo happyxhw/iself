@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -40,6 +41,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 
 	initSecure(e)
 	initRateLimiter(e)
+	initPrometheus(e)
 	initSession(e)
 	initCsrf(e)
 	initCors(e)
@@ -99,4 +101,11 @@ func initSecure(e *echo.Echo) {
 		ContentTypeNosniff: "nosniff",
 		XFrameOptions:      "SAMEORIGIN",
 	}))
+}
+
+func initPrometheus(e *echo.Echo) {
+	p := prometheus.NewPrometheus("echo", func(_ echo.Context) bool {
+		return false
+	})
+	p.Use(e)
 }

@@ -23,9 +23,16 @@ import (
 func Serve() {
 	e := newRouter()
 
+	s := &http.Server{
+		Addr:           viper.GetString("server.addr"),
+		Handler:        e,
+		MaxHeaderBytes: 1 << 20,
+	}
+
 	// Start server
 	go func() {
-		if err := e.Start(viper.GetString("server.addr")); err != nil && err != http.ErrServerClosed {
+		log.Info("start serve", zap.String("addr", s.Addr))
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal("shutting down the server", zap.Error(err))
 		}
 	}()
@@ -35,7 +42,7 @@ func Serve() {
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
+	if err := s.Shutdown(ctx); err != nil {
 		log.Error("shutting down the server", zap.Error(err))
 	}
 }

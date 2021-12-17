@@ -189,12 +189,12 @@ func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.
 
 // Active 注册激活
 func (u *User) Active(ctx context.Context, token string) *em.Error {
-	encrypted, err := u.decryptToken(token)
+	decrypted, err := u.decryptToken(token)
 	if err != nil {
 		return ErrActive
 	}
 	// email|token|timestamp
-	items := strings.Split(encrypted, "|")
+	items := strings.Split(decrypted, "|")
 	if len(items) != 3 {
 		return ErrActive
 	}
@@ -308,7 +308,7 @@ func (u *User) ResetPassword(ctx context.Context, password, token string) *em.Er
 	key := fmt.Sprintf("reset:%s", items[0])
 	oriToken, _ := u.rdb.Get(ctx, key).Result()
 	if oriToken == "" || oriToken != items[1] {
-		return ErrActive
+		return ErrResetPassword
 	}
 	passwordByte, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	updatedMap := map[string]interface{}{

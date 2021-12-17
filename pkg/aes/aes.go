@@ -17,7 +17,10 @@ func pKCS5Padding(plaintext []byte, blockSize int) []byte {
 func pKCS5UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unPadding := int(origData[length-1])
-	return origData[:(length - unPadding)]
+	if length > unPadding {
+		return origData[:(length - unPadding)]
+	}
+	return nil
 }
 
 // Encrypt AES加密
