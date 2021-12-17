@@ -72,6 +72,17 @@ func (u *user) SignIn(c echo.Context) error {
 	return em.OK(c, nil)
 }
 
+// SignOut 退出登录
+func (u *user) SignOut(c echo.Context) error {
+	sess, _ := session.Get("session", c)
+	sess.Options = &sessions.Options{
+		MaxAge: -1,
+	}
+	_ = sess.Save(c.Request(), c.Response())
+	err := em.OK(c, nil)
+	return err
+}
+
 // Callback oauth2 回调接口
 // TODO: redirect to sign-in failed page
 // TODO: redirect to home page

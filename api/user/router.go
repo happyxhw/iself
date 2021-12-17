@@ -31,6 +31,7 @@ func InitRouter(e *echo.Echo) {
 func router(ag, ug *echo.Group, u *user) {
 	ag.POST("/sign-up", u.SignUp)                 // 注册
 	ag.POST("/sign-in", u.SignIn)                 // 登录
+	ag.GET("/sign-out", u.SignOut)                // 退出登录
 	ag.POST("/active", u.Active)                  // 激活
 	ag.POST("/change-password", u.ChangePassword) // 重设密码
 	ag.POST("/reset-password", u.ResetPassword)   // 重设密码
