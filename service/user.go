@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -103,7 +104,7 @@ func (u *User) Info(_ context.Context, id int64, source string) (*model.User, *e
 
 // SignUp 注册用户
 // oauth2 用户后面可通过应用内重置密码的方式设置密码
-func (u *User) SignUp(ctx context.Context, url string, user *model.User) *em.Error {
+func (u *User) SignUp(ctx context.Context, redirectURL string, user *model.User) *em.Error {
 	// 校验用户是否存在
 	var dbUser model.User
 	err := u.db.Select("id").Where("email = ?", user.Email).Find(&dbUser).Error
@@ -121,7 +122,7 @@ func (u *User) SignUp(ctx context.Context, url string, user *model.User) *em.Err
 	if errDB := u.db.Create(&user).Error; errDB != nil {
 		return em.ErrDB.Wrap(errDB)
 	}
-	emErr := u.SendMail(ctx, user.Email, "active", url)
+	emErr := u.SendMail(ctx, user.Email, "active", redirectURL)
 	if emErr != nil {
 		userLogger.Error("send active email", zap.Error(err))
 	}
@@ -217,7 +218,7 @@ func (u *User) Active(ctx context.Context, token string) *em.Error {
 }
 
 // SendMail 发送注册激活、重置密码邮件
-func (u *User) SendMail(ctx context.Context, email, emailType, url string) *em.Error {
+func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL string) *em.Error {
 	freqKey, tokenKey := "active_freq:%s", "active:%s" //nolint:gosec
 	if emailType == "reset" {
 		freqKey, tokenKey = "reset_freq:%s", "reset:%s" //nolint:gosec
@@ -258,7 +259,7 @@ func (u *User) SendMail(ctx context.Context, email, emailType, url string) *em.E
 		return em.ErrInternal.Wrap(err)
 	}
 	subj := "Welcome"
-	link := fmt.Sprintf("%s?token=%s", url, token)
+	link := fmt.Sprintf("%s?token=%s", redirectURL, token)
 	body := fmt.Sprintf("Click this link to %s your account: <p><a href=%s>%s</a></p>", emailType, link, link)
 	err = u.ma.DialAndSend(email, subj, body)
 	if err != nil {
@@ -334,8 +335,8 @@ func (u *User) encryptToken(email, token string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	return base64.StdEncoding.EncodeToString(encrypted), nil
+	tokenB64 := base64.StdEncoding.EncodeToString(encrypted)
+	return url.QueryEscape(tokenB64), nil
 }
 
 func (u *User) decryptToken(token string) (string, error) {
