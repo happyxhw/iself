@@ -1,9 +1,10 @@
-package components
+package component
 
 import (
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/endpoints"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
 	"gorm.io/gorm"
@@ -102,6 +103,8 @@ func initOauth2Conf() {
 			endpoint = github.Endpoint
 		case "google":
 			endpoint = google.Endpoint
+		case "strava":
+			endpoint = endpoints.Strava
 		default:
 			continue
 		}

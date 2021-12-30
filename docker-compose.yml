@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  iself:
+    image: happyxhw/iself:v0.0.1
+    build: .
+    ports:
+      - "8080:8080"
+    command:
+      - "-e"
+      - "prod"
+    volumes:
+      - "./config:/app/config"
+      - "./logs:/app/logs"

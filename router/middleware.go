@@ -17,9 +17,9 @@ import (
 
 	"go.uber.org/zap"
 
+	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/router/components"
 )
 
 func initGlobalMiddleware(e *echo.Echo) {
@@ -48,7 +48,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 }
 
 func initSession(e *echo.Echo) {
-	rdbStore := em.NewStore(components.RDB(), viper.GetString("session.prefix"), []byte(viper.GetString("session.key")))
+	rdbStore := em.NewStore(component.RDB(), viper.GetString("session.prefix"), []byte(viper.GetString("session.key")))
 	e.Use(session.MiddlewareWithConfig(session.Config{
 		Store: rdbStore,
 	}))
@@ -67,7 +67,10 @@ func initCsrf(e *echo.Echo) {
 		CookieHTTPOnly: true,
 		CookieSameSite: http.SameSiteLaxMode,
 		Skipper: func(c echo.Context) bool {
-			return strings.HasPrefix(c.Path(), "/api/auth")
+			if strings.HasPrefix(c.Path(), "/api/auth") {
+				return true
+			}
+			return strings.HasPrefix(c.Path(), "/api/strava/push")
 		},
 	}))
 }
@@ -82,7 +85,7 @@ func initCors(e *echo.Echo) {
 }
 
 func initRateLimiter(e *echo.Echo) {
-	store, err := sredis.NewStoreWithOptions(components.RDB(), limiter.StoreOptions{
+	store, err := sredis.NewStoreWithOptions(component.RDB(), limiter.StoreOptions{
 		Prefix: "limiter",
 	})
 	if err != nil {

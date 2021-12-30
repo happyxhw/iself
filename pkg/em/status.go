@@ -27,6 +27,7 @@ var (
 	ErrReachLimit = NewError(http.StatusTooManyRequests, 40003, "too many requests")
 	ErrParam      = NewError(http.StatusBadRequest, 40005, "invalid parameters")
 	ErrNotFound   = NewError(http.StatusNotFound, 40006, "resource not found")
+	ErrConflict   = NewError(http.StatusConflict, 40007, "resource exists")
 
 	ErrInternal = NewError(http.StatusInternalServerError, 50000, "internal server error")
 	ErrDB       = NewError(http.StatusInternalServerError, 50001, "db error")

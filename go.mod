@@ -33,7 +33,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -87,11 +86,11 @@ require (
 require (
 	git.happyxhw.cn/happyxhw/gin-starter v0.0.0-20211215051403-2c6e6215fc89
 	github.com/go-redis/redis/v8 v8.11.4
-	github.com/google/go-github/v41 v41.0.0
 	github.com/labstack/gommon v0.3.1
 	github.com/stretchr/testify v1.7.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.2.1
 	gorm.io/driver/postgres v1.2.3
 	gorm.io/gorm v1.22.4
+	gorm.io/plugin/soft_delete v1.0.5
 )

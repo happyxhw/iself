@@ -7,6 +7,7 @@ import (
 // UserOauth2 model
 type UserOauth2 struct {
 	ID        int64  `gorm:"column:id;" json:"id"`
+	Name      string `gorm:"column:name;" json:"name"`
 	SourceID  int64  `gorm:"source_id" json:"source_id"`
 	Source    string `gorm:"source" json:"source"`
 	AvatarURL string `gorm:"avatar_url" json:"avatar_url"`

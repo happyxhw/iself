@@ -1,4 +1,4 @@
-package user
+package api
 
 import (
 	"git.happyxhw.cn/happyxhw/iself/model"
@@ -20,7 +20,8 @@ type SignInReq struct {
 
 // Oauth2ExchangeReq oauth2 exchange req
 type Oauth2ExchangeReq struct {
-	Source string `query:"source" validate:"required"`
+	// Source string `query:"source" validate:"oneof=github strava google"`
+	Source string `query:"source"`
 	Code   string `query:"code" validate:"required"`
 	State  string `query:"state" validate:"required"`
 }

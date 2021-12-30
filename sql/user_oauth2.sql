@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS user_oauth2;
 CREATE table user_oauth2
 (
     id         bigserial     NOT NULL PRIMARY KEY,
+    name       varchar(64)   NOT NULL,
     source_id  bigint        NOT NULL,
     source     oauth2_source NOT NULL,
     avatar_url varchar(255)  NOT NULL   DEFAULT '',

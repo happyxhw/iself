@@ -11,12 +11,11 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"github.com/go-playground/validator"
-
-	"git.happyxhw.cn/happyxhw/iself/api/user"
+	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/router/components"
+	"git.happyxhw.cn/happyxhw/iself/router/strava"
+	"git.happyxhw.cn/happyxhw/iself/router/user"
 )
 
 // Serve start web serve
@@ -29,7 +28,6 @@ func Serve() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	// Start server
 	go func() {
 		log.Info("start serve", zap.String("addr", s.Addr))
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -51,9 +49,10 @@ func newRouter() *echo.Echo {
 	e := echo.New()
 	e.Debug = viper.GetBool("server.debug")
 	e.HTTPErrorHandler = em.ErrHandler(e)
-	e.Validator = &em.CustomValidator{Validator: validator.New()}
+	e.Validator = em.NewValidator()
+	e.IPExtractor = echo.ExtractIPFromRealIPHeader(echo.TrustLinkLocal(true), echo.TrustPrivateNet(true))
 
-	components.InitComponent()
+	component.InitComponent()
 	initGlobalMiddleware(e)
 
 	initRouter(e)
@@ -63,4 +62,5 @@ func newRouter() *echo.Echo {
 
 func initRouter(e *echo.Echo) {
 	user.InitRouter(e)
+	strava.InitRouter(e)
 }

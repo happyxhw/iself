@@ -17,13 +17,12 @@ import (
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 
-	"github.com/google/go-github/v41/github"
-
 	"git.happyxhw.cn/happyxhw/iself/model"
 	"git.happyxhw.cn/happyxhw/iself/pkg/aes"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 	"git.happyxhw.cn/happyxhw/iself/pkg/mailer"
+	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
 	"git.happyxhw.cn/happyxhw/iself/pkg/util"
 )
 
@@ -92,7 +91,7 @@ func (u *User) Info(_ context.Context, id int64, source string) (*model.User, *e
 		query = u.db.Select("id, email, name, avatar_url").Where("id = ?", id)
 	} else {
 		// TODO
-		query = u.db.Select("id, avatar_url").Where("source_id = ? AND source = ?", id, source)
+		query = u.db.Model(&model.UserOauth2{}).Select("id, avatar_url").Where("source_id = ? AND source = ?", id, source)
 	}
 	err := query.Find(&dbUser).Error
 	if err != nil {
@@ -145,7 +144,7 @@ func (u *User) SignIn(_ context.Context, user *model.User) (*model.User, *em.Err
 }
 
 // SignInByOauth2 oauth2 登录
-func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.User, *em.Error) {
+func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.UserOauth2, *em.Error) {
 	conf, ok := u.oauth2Conf[source]
 	if !ok {
 		return nil, ErrOauth2Source
@@ -158,33 +157,54 @@ func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.
 	}
 	cli := conf.Client(ctx, token)
 	// TODO: 支持其他客户端
-	client := github.NewClient(cli)
-	authenticatedUser, _, err := client.Users.Get(ctx, "")
+	userInfo, err := u.GetUserInfo(ctx, source, cli)
 	if err != nil {
 		return nil, ErrGetOauth2User.Wrap(err)
 	}
-	if authenticatedUser.ID == nil {
+	if userInfo == nil || userInfo.SourceID == 0 {
 		return nil, ErrGetOauth2User
 	}
-	if saveErr := u.tokenSrv.SaveToken(token, source, *authenticatedUser.ID); saveErr != nil {
+	if saveErr := u.tokenSrv.SaveToken(token, source, userInfo.SourceID); saveErr != nil {
 		return nil, em.ErrRedis.Wrap(err)
 	}
 
 	var uo model.UserOauth2
 	err = u.db.Select("id").
-		Where("source_id = ? AND source = ?", authenticatedUser.ID, source).Find(&uo).Error
+		Where("source_id = ? AND source = ?", userInfo.SourceID, source).Find(&uo).Error
 	if err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
 	if uo.ID > 0 {
-		return &model.User{ID: *authenticatedUser.ID, Source: source}, nil
+		return userInfo, nil
 	}
 
-	if err := u.db.Create(newGithubUser(authenticatedUser)).Error; err != nil {
+	if err := u.db.Create(userInfo).Error; err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
 
-	return &model.User{ID: *authenticatedUser.ID, Source: source}, nil
+	return userInfo, nil
+}
+
+func (u *User) GetUserInfo(ctx context.Context, source string, cli *http.Client) (*model.UserOauth2, error) {
+	switch source {
+	case "strava":
+		stravaCli := strava.NewClient(cli)
+		athlete, err := stravaCli.Athlete.Athlete(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return &model.UserOauth2{
+			Name:      athlete.Username,
+			SourceID:  athlete.Id,
+			Source:    "strava",
+			AvatarURL: athlete.ProfileMedium,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}, nil
+	case "github":
+		return nil, nil
+	}
+	return nil, nil
 }
 
 // Active 注册激活
@@ -349,16 +369,4 @@ func (u *User) decryptToken(token string) (string, error) {
 		return "", err
 	}
 	return string(decrypted), nil
-}
-
-func newGithubUser(u *github.User) *model.UserOauth2 {
-	uo := &model.UserOauth2{
-		Source:   "github",
-		SourceID: *u.ID,
-	}
-	if u.AvatarURL != nil {
-		uo.AvatarURL = *u.AvatarURL
-	}
-
-	return uo
 }

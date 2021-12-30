@@ -4,8 +4,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
 
+	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
-	"git.happyxhw.cn/happyxhw/iself/router/components"
 	"git.happyxhw.cn/happyxhw/iself/service"
 )
 
@@ -15,10 +15,10 @@ func InitRouter(e *echo.Echo) {
 	ug := e.Group("/api/user")
 	ug.Use(em.AuthRequired())
 	userSrvOpt := service.UserOption{
-		DB:         components.DB(),
-		RDB:        components.RDB(),
-		Oauth2Conf: components.Oauth2Conf(),
-		Ma:         components.Mailer(),
+		DB:         component.DB(),
+		RDB:        component.RDB(),
+		Oauth2Conf: component.Oauth2Conf(),
+		Ma:         component.Mailer(),
 		AesKey:     viper.GetString("secure.key"),
 	}
 	srv := service.NewUser(&userSrvOpt)

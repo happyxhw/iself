@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -11,6 +12,13 @@ import (
 	"golang.org/x/oauth2"
 
 	"git.happyxhw.cn/happyxhw/gin-starter/pkg/log"
+
+	"git.happyxhw.cn/happyxhw/iself/pkg/em"
+)
+
+var (
+	// ErrGetToken 获取token错误
+	ErrGetToken = em.NewError(http.StatusBadRequest, 40201, "get oauth2 token")
 )
 
 // Token srv

@@ -1,6 +1,8 @@
 package em
 
 import (
+	"fmt"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,12 +34,36 @@ func (e *Error) Error() string {
 	return e.Message
 }
 
+// Msg wrap msg
+func (e *Error) Msg(msg string) *Error {
+	newErr := Error{
+		Status:       e.Status,
+		Code:         e.Code,
+		Message:      e.Message,
+		ErrorMessage: e.ErrorMessage,
+	}
+	if msg != "" {
+		if newErr.Message == "" {
+			newErr.Message = msg
+		} else {
+			newErr.Message = fmt.Sprintf("%s; %s", newErr.Message, msg)
+		}
+	}
+	return &newErr
+}
+
 // Wrap 包装 err
 func (e *Error) Wrap(err error) *Error {
-	if err != nil {
-		e.ErrorMessage = err.Error()
+	newErr := Error{
+		Status:       e.Status,
+		Code:         e.Code,
+		Message:      e.Message,
+		ErrorMessage: e.ErrorMessage,
 	}
-	return e
+	if err != nil {
+		newErr.ErrorMessage = err.Error()
+	}
+	return &newErr
 }
 
 // ErrHandler handler

@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
@@ -9,6 +10,7 @@ import (
 	"github.com/labstack/gommon/random"
 	"github.com/spf13/viper"
 
+	"git.happyxhw.cn/happyxhw/iself/api"
 	"git.happyxhw.cn/happyxhw/iself/model"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/service"
@@ -26,12 +28,12 @@ func (u *user) Info(c echo.Context) error {
 		return err
 	}
 
-	return em.OK(c, NewInfo(dbUser))
+	return em.OK(c, api.NewInfo(dbUser))
 }
 
 // SignUp 用户注册
 func (u *user) SignUp(c echo.Context) error {
-	var req SignUpReq
+	var req api.SignUpReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -49,7 +51,7 @@ func (u *user) SignUp(c echo.Context) error {
 
 // SignIn 用户登录
 func (u *user) SignIn(c echo.Context) error {
-	var req SignInReq
+	var req api.SignInReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -76,7 +78,12 @@ func (u *user) SignIn(c echo.Context) error {
 func (u *user) SignOut(c echo.Context) error {
 	sess, _ := session.Get("session", c)
 	sess.Options = &sessions.Options{
-		MaxAge: -1,
+		Path:     viper.GetString("session.path"),
+		MaxAge:   0,
+		Domain:   viper.GetString("session.domain"),
+		Secure:   viper.GetBool("session.secure"),
+		SameSite: http.SameSiteLaxMode,
+		HttpOnly: true,
 	}
 	_ = sess.Save(c.Request(), c.Response())
 	err := em.OK(c, nil)
@@ -87,13 +94,28 @@ func (u *user) SignOut(c echo.Context) error {
 // TODO: redirect to sign-in failed page
 // TODO: redirect to home page
 func (u *user) Callback(c echo.Context) error {
-	var req Oauth2ExchangeReq
+	var req api.Oauth2ExchangeReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
+	stateSource := strings.Split(req.State, "-")
+	if len(stateSource) != 2 {
+		return em.ErrBadRequest
+	}
+	req.Source = stateSource[0]
 	sess, _ := session.Get("_state", c)
 	url, _ := sess.Values["url"].(string)
 	state, _ := sess.Values["state"].(string)
+	// delete _state session
+	sess.Options = &sessions.Options{
+		Path:     viper.GetString("session.path"),
+		Domain:   viper.GetString("session.domain"),
+		MaxAge:   0,
+		Secure:   viper.GetBool("session.secure"),
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	_ = sess.Save(c.Request(), c.Response())
 	if state == "" || state != req.State {
 		return service.ErrOauth2State
 	}
@@ -102,13 +124,13 @@ func (u *user) Callback(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	u.setSession(c, &model.User{ID: dbUser.ID, Source: dbUser.Source})
+	u.setSession(c, &model.User{ID: dbUser.SourceID, Source: dbUser.Source})
 	return c.Redirect(http.StatusPermanentRedirect, url)
 }
 
 // SetState 设置 oauth2 state
 func (u *user) SetState(c echo.Context) error {
-	var req SetStateReq
+	var req api.SetStateReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -119,7 +141,7 @@ func (u *user) SetState(c echo.Context) error {
 
 // Active 激活注册
 func (u *user) Active(c echo.Context) error {
-	var req ActiveReq
+	var req api.ActiveReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -132,7 +154,7 @@ func (u *user) Active(c echo.Context) error {
 
 // ChangePassword 修改密码, 用户在登录状态下
 func (u *user) ChangePassword(c echo.Context) error {
-	var req ChangePasswordReq
+	var req api.ChangePasswordReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -150,7 +172,7 @@ func (u *user) ChangePassword(c echo.Context) error {
 
 // ResetPassword 用户忘记密码后重置密码，非登录状态
 func (u *user) ResetPassword(c echo.Context) error {
-	var req ResetPasswordReq
+	var req api.ResetPasswordReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -163,7 +185,7 @@ func (u *user) ResetPassword(c echo.Context) error {
 
 // SendEmail 发送激活或重置密码邮件
 func (u *user) SendEmail(c echo.Context) error {
-	var req SendEmailReq
+	var req api.SendEmailReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -197,7 +219,7 @@ func (u *user) setSession(c echo.Context, user *model.User) {
 		Domain:   viper.GetString("session.domain"),
 		MaxAge:   viper.GetInt("session.max_age"),
 		Secure:   viper.GetBool("session.secure"),
-		HttpOnly: true,
+		HttpOnly: false,
 		SameSite: http.SameSiteLaxMode,
 	}
 	c.SetCookie(&cookie)
@@ -210,7 +232,7 @@ func (u *user) setStateSession(c echo.Context, state, url string) {
 	sess.Options = &sessions.Options{
 		Path:     viper.GetString("session.path"),
 		Domain:   viper.GetString("session.domain"),
-		MaxAge:   60,
+		MaxAge:   viper.GetInt("session.max_age"),
 		Secure:   viper.GetBool("session.secure"),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
