@@ -15,7 +15,7 @@ func InitRouter(e *echo.Echo) {
 	stravaSrvOpt := service.StravaOption{
 		DB:         component.DB(),
 		RDB:        component.RDB(),
-		Oauth2Conf: component.Oauth2Conf()["starava"],
+		Oauth2Conf: component.Oauth2Conf()["strava"],
 		AesKey:     viper.GetString("secure.key"),
 	}
 	srv := service.NewStrava(&stravaSrvOpt)
@@ -35,6 +35,7 @@ func router(g *echo.Group, s *strava) {
 	g.GET("/activities", s.ActivityList)
 	g.GET("/activities/:id", s.Activity)
 	g.GET("/activities/summary_stats", s.SummaryStatsNow)
+	g.GET("/activities/date_chart", s.DateChart)
 
 	g.POST("/goals", s.CreateGoal)
 	g.PUT("/goals", s.UpdateGoal)

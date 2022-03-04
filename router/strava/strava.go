@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	api2 "git.happyxhw.cn/happyxhw/iself/api"
+	"git.happyxhw.cn/happyxhw/iself/api"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	sm "git.happyxhw.cn/happyxhw/iself/pkg/strava"
 	"git.happyxhw.cn/happyxhw/iself/service"
@@ -59,15 +59,15 @@ func (s *strava) VerifyPush(c echo.Context) error {
 
 // ActivityList 活动列表
 func (s *strava) ActivityList(c echo.Context) error {
-	var req api2.ActivityListReq
+	var req api.ActivityListPageReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
-	if req.Limit > defaultPageSize || req.Limit == 0 {
-		req.Limit = defaultPageSize
+	if req.PageSize > defaultPageSize || req.PageSize == 0 {
+		req.PageSize = defaultPageSize
 	}
 	sourceID, _ := c.Get("id").(int64)
-	results, err := s.srv.ActivityList(c.Request().Context(), &req, sourceID)
+	results, err := s.srv.ActivityPageList(c.Request().Context(), &req, sourceID)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (s *strava) Activity(c echo.Context) error {
 }
 
 func (s *strava) SummaryStatsNow(c echo.Context) error {
-	var req api2.StatsNowReq
+	var req api.StatsNowReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
@@ -103,8 +103,22 @@ func (s *strava) SummaryStatsNow(c echo.Context) error {
 	return em.OK(c, result)
 }
 
+func (s *strava) DateChart(c echo.Context) error {
+	var req api.DateChartReq
+	if err := em.Bind(c, &req); err != nil {
+		return em.ErrParam.Wrap(err)
+	}
+	sourceID, _ := c.Get("id").(int64)
+	result, err := s.srv.DateChart(c.Request().Context(), &req, sourceID)
+	if err != nil {
+		return err
+	}
+
+	return em.OK(c, result)
+}
+
 func (s *strava) CreateGoal(c echo.Context) error {
-	var req api2.GoalReq
+	var req api.GoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
@@ -118,7 +132,7 @@ func (s *strava) CreateGoal(c echo.Context) error {
 }
 
 func (s *strava) UpdateGoal(c echo.Context) error {
-	var req api2.GoalReq
+	var req api.GoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
@@ -132,7 +146,7 @@ func (s *strava) UpdateGoal(c echo.Context) error {
 }
 
 func (s *strava) DeleteGoal(c echo.Context) error {
-	var req api2.GoalReq
+	var req api.GoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
@@ -146,7 +160,7 @@ func (s *strava) DeleteGoal(c echo.Context) error {
 }
 
 func (s *strava) QueryGoal(c echo.Context) error {
-	var req api2.QueryGoalReq
+	var req api.QueryGoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}

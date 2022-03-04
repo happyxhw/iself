@@ -130,6 +130,49 @@ func (s *Strava) ActivityList(_ context.Context, req *api.ActivityListReq, sourc
 	}, nil
 }
 
+// ActivityPageList get activity list
+func (s *Strava) ActivityPageList(_ context.Context, req *api.ActivityListPageReq, sourceID int64) (interface{}, *em.Error) {
+	fields := []string{
+		"id", "name", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "elev_high",
+		"elev_low", "type", "start_date_local", "average_speed", "max_speed", "max_heartrate",
+		"average_heartrate", "summary_polyline", "calories",
+	}
+	limit := req.PageSize
+	offset := (req.Page - 1) * req.PageSize
+	query := s.db.Model(&model.ActivityDetail{}).Where("athlete_id = ?", sourceID)
+	if req.Type != api.All {
+		query = query.Where("type = ?", req.Type)
+	}
+	var total int64
+	err := query.Count(&total).Error
+	if err != nil {
+		return nil, em.ErrDB.Wrap(err)
+	}
+
+	if total == 0 {
+		return nil, nil
+	}
+	var ids []int64
+	err = query.Order("id DESC").Limit(limit).Offset(offset).Pluck("id", &ids).Error
+	if err != nil {
+		return nil, em.ErrDB.Wrap(err)
+	}
+	var results []*model.ActivityDetail
+	err = s.db.Select(fields).Where("id IN (?)", ids).Order("id desc").Find(&results).Error
+	if err != nil {
+		return nil, em.ErrDB.Wrap(err)
+	}
+	for i, item := range results {
+		results[i].AverageSpeed = transformVelocity(item.AverageSpeed, item.Type)
+		results[i].MaxSpeed = transformVelocity(item.MaxSpeed, item.Type)
+	}
+
+	return echo.Map{
+		"total": total,
+		"list":  results,
+	}, nil
+}
+
 func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, *em.Error) {
 	fields := []string{
 		"id", "name", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "elev_high",
@@ -163,7 +206,7 @@ func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, *e
 			streamSet.VelocitySmooth.Data[i] = float32(transformVelocity(float64(item), activity.Type))
 		}
 	}
-	activity.AverageHeartrate = transformVelocity(activity.AverageHeartrate, activity.Type)
+	activity.AverageSpeed = transformVelocity(activity.AverageSpeed, activity.Type)
 	res := echo.Map{
 		"activity":        activity,
 		"distance":        streamSet.Distance,
@@ -272,6 +315,160 @@ func (s *Strava) SummaryStatsNow(ctx context.Context, req *api.StatsNowReq, sour
 		r.YearProcess = fmt.Sprintf("%.0f", tmp.Year/goalMap["year"]*100)
 	}
 	return &r, nil
+}
+
+const (
+	limitWeek  = 12
+	limitMonth = 12
+	limitYear  = 12
+)
+
+// DateChart 以日期为横轴的统计数据：近一个月，近三个月，近半年，全年 by week || month || year
+func (s *Strava) DateChart(ctx context.Context, req *api.DateChartReq, sourceID int64) (echo.Map, *em.Error) {
+	valMap := make(map[string]float64)
+	now := time.Now()
+	startDate, start := findStartDate(req, now)
+
+	rows, err := s.db.Model(&model.ActivityDetail{}).
+		Select(
+			fmt.Sprintf("%s(%s) AS %s, date_trunc('%s', start_date_local) AS %s",
+				req.Method, req.Field, req.Field, req.Freq, req.Freq),
+		).
+		Where("athlete_id = ? AND type = ? AND start_date_local >= ?", sourceID, req.Type, startDate).
+		Group(req.Freq).Order(req.Freq).Rows()
+	if err != nil {
+		return nil, em.ErrDB.Wrap(err)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, em.ErrDB.Wrap(err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	for rows.Next() {
+		var t float64
+		var date time.Time
+		_ = rows.Scan(&t, &date)
+		valMap[date.Format("2006-01-02")] = t
+	}
+
+	date, value := makeChartData(req, valMap, start, now)
+	if len(value) > req.Size {
+		value = value[len(value)-req.Size:]
+		date = date[len(date)-req.Size:]
+	}
+
+	max, min, avg, maxIndex, minIndex := findMarker(value)
+	result := echo.Map{
+		"value":     value,
+		"time":      date,
+		"max":       max,
+		"min":       min,
+		"avg":       avg,
+		"max_index": maxIndex,
+		"min_index": minIndex,
+	}
+	return result, nil
+}
+
+func findMarker(data []float64) (max, min, avg float64, maxIndex, minIndex int) {
+	if len(data) == 0 {
+		return
+	}
+	max, min, maxIndex, minIndex = data[0], -1, 0, -1
+	var cnt int
+	var sum float64
+	for i, item := range data {
+		// ignore zero value
+		if item == 0 {
+			continue
+		}
+		if item > max {
+			max = item
+			maxIndex = i
+		}
+		if item < min || min == -1 {
+			min = item
+			minIndex = i
+		}
+		sum += item
+		cnt++
+	}
+	if minIndex == -1 || minIndex == maxIndex {
+		minIndex = 0
+		min = 0
+	}
+	if cnt != 0 {
+		avg = sum / float64(cnt)
+	}
+
+	return max, min, avg, maxIndex, minIndex
+}
+
+func findStartDate(req *api.DateChartReq, now time.Time) (string, time.Time) {
+	var dateStart string
+	var start time.Time
+	switch req.Freq {
+	case api.Week:
+		if req.Size > limitWeek {
+			req.Size = limitWeek
+		}
+		// 向后找到起始日期（星期一）
+		start = now.AddDate(0, 0, -7*req.Size)
+		week := start.Weekday()
+		if week != time.Monday {
+			start = start.AddDate(0, 0, int(time.Monday)-int(week))
+		}
+		year, month, day := start.AddDate(0, -req.Size, 0).Date()
+		dateStart = fmt.Sprintf("%d-%d-%d", year, month, day)
+	case api.Month:
+		if req.Size > limitMonth {
+			req.Size = limitMonth
+		}
+		start = now.AddDate(0, -req.Size, 0)
+		year, month, _ := start.Date()
+		dateStart = fmt.Sprintf("%d-%d-01", year, month)
+	case api.Year:
+		if req.Size > limitYear {
+			req.Size = limitYear
+		}
+		start = now.AddDate(-req.Size, 0, 0)
+		year, _, _ := start.Date()
+		dateStart = fmt.Sprintf("%d-01-01", year)
+	}
+	start, _ = time.Parse("2006-01-02", dateStart)
+	return dateStart, start
+}
+
+func makeChartData(req *api.DateChartReq, valMap map[string]float64, start, now time.Time) (date []string, value []float64) {
+	var fraction float64 = 1
+	if v, ok := fractionMap[req.Field]; ok {
+		fraction = v
+	}
+	for now.After(start) {
+		var key string
+		switch req.Freq {
+		case api.Week:
+			key = start.Format("2006-01-02")
+			date = append(date, start.Format("01-02"))
+			start = start.AddDate(0, 0, 7)
+		case api.Month:
+			// do not use time.AddDate for month + 1
+			key = start.Format("2006-01") + "-01"
+			year, month, _ := start.Date()
+			date = append(date, start.Format("01"))
+			start = time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
+		case api.Year:
+			key = start.Format("2006") + "-01-01"
+			date = append(date, start.Format("2006"))
+			start = start.AddDate(1, 0, 0)
+		}
+		if v, ok := valMap[key]; ok {
+			value = append(value, v/fraction)
+		} else {
+			value = append(value, 0.0)
+		}
+	}
+	return date, value
 }
 
 func transformVelocity(vel float64, activityType string) float64 {

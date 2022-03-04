@@ -31,7 +31,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 		},
 	)
 	// recovery
-	// e.Use(middleware.Recover())
+	e.Use(middleware.Recover())
 	// request id
 	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 		Generator: uuid.NewString,

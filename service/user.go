@@ -269,7 +269,6 @@ func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL strin
 	token := util.GenerateToken(16)
 	key = fmt.Sprintf(tokenKey, email)
 	// 失效原来的 token
-	_ = u.rdb.Del(ctx, key)
 	err = u.rdb.Set(ctx, key, token, time.Minute*30).Err()
 	if err != nil {
 		return em.ErrRedis.Wrap(err)
