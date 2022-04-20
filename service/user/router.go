@@ -6,7 +6,8 @@ import (
 
 	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
-	"git.happyxhw.cn/happyxhw/iself/service"
+	"git.happyxhw.cn/happyxhw/iself/service/user/controller"
+	"git.happyxhw.cn/happyxhw/iself/service/user/handler"
 )
 
 // InitRouter 初始化用户路由
@@ -14,21 +15,19 @@ func InitRouter(e *echo.Echo) {
 	ag := e.Group("/api/auth")
 	ug := e.Group("/api/user")
 	ug.Use(em.AuthRequired())
-	userSrvOpt := service.UserOption{
+	userSrvOpt := handler.UserOption{
 		DB:         component.DB(),
 		RDB:        component.RDB(),
 		Oauth2Conf: component.Oauth2Conf(),
 		Ma:         component.Mailer(),
 		AesKey:     viper.GetString("secure.key"),
 	}
-	srv := service.NewUser(&userSrvOpt)
-	u := user{
-		srv: srv,
-	}
-	router(ag, ug, &u)
+	srv := handler.NewUser(&userSrvOpt)
+	u := controller.NewUser(srv)
+	router(ag, ug, u)
 }
 
-func router(ag, ug *echo.Group, u *user) {
+func router(ag, ug *echo.Group, u *controller.User) {
 	ag.POST("/sign-up", u.SignUp)                 // 注册
 	ag.POST("/sign-in", u.SignIn)                 // 登录
 	ag.GET("/sign-out", u.SignOut)                // 退出登录

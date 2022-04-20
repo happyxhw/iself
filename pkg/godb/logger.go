@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	gLogger "gorm.io/gorm/logger"
 )
@@ -66,24 +67,28 @@ func (gl gormLogger) Error(_ context.Context, s string, i ...interface{}) {
 	gl.logger.Sugar().Errorf(s, i...)
 }
 
-func (gl gormLogger) Trace(_ context.Context, begin time.Time, fc func() (string, int64), err error) {
+func (gl gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
 	if gl.level <= 0 {
 		return
 	}
 	elapsed := time.Since(begin)
+	reqID, _ := ctx.Value(echo.HeaderXRequestID).(string)
 	switch {
 	case err != nil && gl.level >= gLogger.Error:
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
-		gl.logger.Error("[GORM]", zap.Error(err), zap.Int64("elapsed", elapsed.Milliseconds()), zap.Int64("rows", rows), zap.String("sql", sql))
+		gl.logger.Error("[GORM]", zap.Error(err), zap.Int64("elapsed", elapsed.Milliseconds()),
+			zap.Int64("rows", rows), zap.String("sql", sql), zap.String("X-Request-ID", reqID))
 	case gl.slowThreshold != 0 && elapsed > gl.slowThreshold && gl.level >= gLogger.Warn:
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
-		gl.logger.Warn("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()), zap.Int64("rows", rows), zap.String("sql", sql))
+		gl.logger.Warn("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()),
+			zap.Int64("rows", rows), zap.String("sql", sql), zap.String("X-Request-ID", reqID))
 	case gl.level >= gLogger.Info:
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
-		gl.logger.Info("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()), zap.Int64("rows", rows), zap.String("sql", sql))
+		gl.logger.Info("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()),
+			zap.Int64("rows", rows), zap.String("sql", sql), zap.String("X-Request-ID", reqID))
 	}
 }
 

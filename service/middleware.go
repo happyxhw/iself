@@ -1,25 +1,24 @@
-package router
+package service
 
 import (
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
 	"github.com/ulule/limiter/v3"
-
 	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 
 	"go.uber.org/zap"
 
 	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
+
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"git.happyxhw.cn/happyxhw/iself/third_party"
 )
 
 func initGlobalMiddleware(e *echo.Echo) {
@@ -33,9 +32,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 	// recovery
 	e.Use(middleware.Recover())
 	// request id
-	e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
-		Generator: uuid.NewString,
-	}))
+	e.Use(em.RequestID())
 	// access log
 	e.Use(em.Logger(apiLogger))
 
@@ -107,7 +104,7 @@ func initSecure(e *echo.Echo) {
 }
 
 func initPrometheus(e *echo.Echo) {
-	p := prometheus.NewPrometheus("echo", func(_ echo.Context) bool {
+	p := third_party.NewPrometheus("echo", func(_ echo.Context) bool {
 		return false
 	})
 	p.Use(e)

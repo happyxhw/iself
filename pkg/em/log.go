@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Logger for api access
+// Logger for types access
 func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -55,7 +55,7 @@ func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 				zap.Int64("req_size", reqSize),
 				zap.Int64("resp_size", respSize),
 				zap.String("err", errMsg),
-				zap.String("request_id", id),
+				zap.String(echo.HeaderXRequestID, id),
 				zap.String("ua", req.UserAgent()),
 			}
 

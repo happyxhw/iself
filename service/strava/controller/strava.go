@@ -1,4 +1,4 @@
-package strava
+package controller
 
 import (
 	"net/http"
@@ -6,10 +6,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"git.happyxhw.cn/happyxhw/iself/api"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
-	sm "git.happyxhw.cn/happyxhw/iself/pkg/strava"
-	"git.happyxhw.cn/happyxhw/iself/service"
+	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"git.happyxhw.cn/happyxhw/iself/service/strava/handler"
+	"git.happyxhw.cn/happyxhw/iself/service/strava/types"
 )
 
 const (
@@ -20,26 +20,33 @@ const (
 	defaultPageSize = 20
 )
 
-// strava api
-type strava struct {
-	srv     *service.Strava
-	goalSrv *service.Goal
+// Strava types
+type Strava struct {
+	srv     *handler.Strava
+	goalSrv *handler.Goal
 }
 
-// Push strava push event
-func (s *strava) Push(c echo.Context) error {
-	var req sm.SubscriptionEvent
+func NewStrava(srv *handler.Strava, goalSrv *handler.Goal) *Strava {
+	return &Strava{
+		srv:     srv,
+		goalSrv: goalSrv,
+	}
+}
+
+// Push Strava push event
+func (s *Strava) Push(c echo.Context) error {
+	var req strava.SubscriptionEvent
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrBadRequest.Wrap(err)
 	}
-	if emErr := s.srv.Push(c.Request().Context(), &req); emErr != nil {
+	if emErr := s.srv.Push(em.GetCtx(c), &req); emErr != nil {
 		return emErr
 	}
 	return em.OK(c, nil)
 }
 
 // VerifyPush 校验订阅时服务的可用性
-func (s *strava) VerifyPush(c echo.Context) error {
+func (s *Strava) VerifyPush(c echo.Context) error {
 	mode := c.QueryParam("hub.mode")
 	token := c.QueryParam("hub.verify_token")
 	challenge := c.QueryParam("hub.challenge")
@@ -58,8 +65,8 @@ func (s *strava) VerifyPush(c echo.Context) error {
 }
 
 // ActivityList 活动列表
-func (s *strava) ActivityList(c echo.Context) error {
-	var req api.ActivityListPageReq
+func (s *Strava) ActivityList(c echo.Context) error {
+	var req types.ActivityListPageReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
@@ -67,7 +74,7 @@ func (s *strava) ActivityList(c echo.Context) error {
 		req.PageSize = defaultPageSize
 	}
 	sourceID, _ := c.Get("id").(int64)
-	results, err := s.srv.ActivityPageList(c.Request().Context(), &req, sourceID)
+	results, err := s.srv.ActivityPageList(em.GetCtx(c), &req, sourceID)
 	if err != nil {
 		return err
 	}
@@ -75,13 +82,13 @@ func (s *strava) ActivityList(c echo.Context) error {
 	return em.OK(c, results)
 }
 
-func (s *strava) Activity(c echo.Context) error {
+func (s *Strava) Activity(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	if id == 0 {
 		return em.ErrParam
 	}
 	sourceID, _ := c.Get("id").(int64)
-	result, err := s.srv.Activity(c.Request().Context(), id, sourceID)
+	result, err := s.srv.Activity(em.GetCtx(c), id, sourceID)
 	if err != nil {
 		return err
 	}
@@ -89,13 +96,13 @@ func (s *strava) Activity(c echo.Context) error {
 	return em.OK(c, result)
 }
 
-func (s *strava) SummaryStatsNow(c echo.Context) error {
-	var req api.StatsNowReq
+func (s *Strava) SummaryStatsNow(c echo.Context) error {
+	var req types.StatsNowReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
 	sourceID, _ := c.Get("id").(int64)
-	result, err := s.srv.SummaryStatsNow(c.Request().Context(), &req, sourceID)
+	result, err := s.srv.SummaryStatsNow(em.GetCtx(c), &req, sourceID)
 	if err != nil {
 		return err
 	}
@@ -103,13 +110,13 @@ func (s *strava) SummaryStatsNow(c echo.Context) error {
 	return em.OK(c, result)
 }
 
-func (s *strava) DateChart(c echo.Context) error {
-	var req api.DateChartReq
+func (s *Strava) DateChart(c echo.Context) error {
+	var req types.DateChartReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
 	sourceID, _ := c.Get("id").(int64)
-	result, err := s.srv.DateChart(c.Request().Context(), &req, sourceID)
+	result, err := s.srv.DateChart(em.GetCtx(c), &req, sourceID)
 	if err != nil {
 		return err
 	}
@@ -117,56 +124,56 @@ func (s *strava) DateChart(c echo.Context) error {
 	return em.OK(c, result)
 }
 
-func (s *strava) CreateGoal(c echo.Context) error {
-	var req api.GoalReq
+func (s *Strava) CreateGoal(c echo.Context) error {
+	var req types.GoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
 	sourceID, _ := c.Get("id").(int64)
 	req.SourceID = sourceID
-	err := s.goalSrv.Create(&req)
+	err := s.goalSrv.Create(em.GetCtx(c), &req)
 	if err != nil {
 		return err
 	}
 	return em.OK(c, nil)
 }
 
-func (s *strava) UpdateGoal(c echo.Context) error {
-	var req api.GoalReq
+func (s *Strava) UpdateGoal(c echo.Context) error {
+	var req types.GoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
 	sourceID, _ := c.Get("id").(int64)
 	req.SourceID = sourceID
-	err := s.goalSrv.UpdateValue(&req)
+	err := s.goalSrv.UpdateValue(em.GetCtx(c), &req)
 	if err != nil {
 		return err
 	}
 	return em.OK(c, nil)
 }
 
-func (s *strava) DeleteGoal(c echo.Context) error {
-	var req api.GoalReq
+func (s *Strava) DeleteGoal(c echo.Context) error {
+	var req types.GoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
 	sourceID, _ := c.Get("id").(int64)
 	req.SourceID = sourceID
-	err := s.goalSrv.Delete(&req)
+	err := s.goalSrv.Delete(em.GetCtx(c), &req)
 	if err != nil {
 		return err
 	}
 	return em.OK(c, nil)
 }
 
-func (s *strava) QueryGoal(c echo.Context) error {
-	var req api.QueryGoalReq
+func (s *Strava) QueryGoal(c echo.Context) error {
+	var req types.QueryGoalReq
 	if err := em.Bind(c, &req); err != nil {
 		return em.ErrParam.Wrap(err)
 	}
 	sourceID, _ := c.Get("id").(int64)
 	req.SourceID = sourceID
-	result, err := s.goalSrv.Query(sourceID, req.Type, req.Field)
+	result, err := s.goalSrv.Query(em.GetCtx(c), sourceID, req.Type, req.Field)
 	if err != nil {
 		return err
 	}

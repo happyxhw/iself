@@ -1,4 +1,4 @@
-package user
+package controller
 
 import (
 	"net/http"
@@ -10,34 +10,40 @@ import (
 	"github.com/labstack/gommon/random"
 	"github.com/spf13/viper"
 
-	"git.happyxhw.cn/happyxhw/iself/api"
 	"git.happyxhw.cn/happyxhw/iself/model"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
-	"git.happyxhw.cn/happyxhw/iself/service"
+	"git.happyxhw.cn/happyxhw/iself/service/user/handler"
+	"git.happyxhw.cn/happyxhw/iself/service/user/types"
 )
 
-type user struct {
-	srv *service.User
+type User struct {
+	srv *handler.User
 }
 
-func (u *user) Info(c echo.Context) error {
+func NewUser(srv *handler.User) *User {
+	return &User{
+		srv: srv,
+	}
+}
+
+func (u *User) Info(c echo.Context) error {
 	userID, _ := c.Get("id").(int64)
 	source, _ := c.Get("source").(string)
-	dbUser, err := u.srv.Info(c.Request().Context(), userID, source)
+	dbUser, err := u.srv.Info(em.GetCtx(c), userID, source)
 	if err != nil {
 		return err
 	}
 
-	return em.OK(c, api.NewInfo(dbUser))
+	return em.OK(c, types.NewInfo(dbUser))
 }
 
 // SignUp 用户注册
-func (u *user) SignUp(c echo.Context) error {
-	var req api.SignUpReq
+func (u *User) SignUp(c echo.Context) error {
+	var req types.SignUpReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.SignUp(c.Request().Context(), req.ActiveURL, &model.User{
+	err := u.srv.SignUp(em.GetCtx(c), req.ActiveURL, &model.User{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
@@ -50,12 +56,12 @@ func (u *user) SignUp(c echo.Context) error {
 }
 
 // SignIn 用户登录
-func (u *user) SignIn(c echo.Context) error {
-	var req api.SignInReq
+func (u *User) SignIn(c echo.Context) error {
+	var req types.SignInReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	dbUser, err := u.srv.SignIn(c.Request().Context(), &model.User{
+	dbUser, err := u.srv.SignIn(em.GetCtx(c), &model.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -75,7 +81,7 @@ func (u *user) SignIn(c echo.Context) error {
 }
 
 // SignOut 退出登录
-func (u *user) SignOut(c echo.Context) error {
+func (u *User) SignOut(c echo.Context) error {
 	sess, _ := session.Get("session", c)
 	sess.Options = &sessions.Options{
 		Path:     viper.GetString("session.path"),
@@ -93,8 +99,8 @@ func (u *user) SignOut(c echo.Context) error {
 // Callback oauth2 回调接口
 // TODO: redirect to sign-in failed page
 // TODO: redirect to home page
-func (u *user) Callback(c echo.Context) error {
-	var req api.Oauth2ExchangeReq
+func (u *User) Callback(c echo.Context) error {
+	var req types.Oauth2ExchangeReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -117,10 +123,10 @@ func (u *user) Callback(c echo.Context) error {
 	}
 	_ = sess.Save(c.Request(), c.Response())
 	if state == "" || state != req.State {
-		return service.ErrOauth2State
+		return handler.ErrOauth2State
 	}
 
-	dbUser, err := u.srv.SignInByOauth2(c.Request().Context(), req.Source, req.Code)
+	dbUser, err := u.srv.SignInByOauth2(em.GetCtx(c), req.Source, req.Code)
 	if err != nil {
 		return err
 	}
@@ -129,8 +135,8 @@ func (u *user) Callback(c echo.Context) error {
 }
 
 // SetState 设置 oauth2 state
-func (u *user) SetState(c echo.Context) error {
-	var req api.SetStateReq
+func (u *User) SetState(c echo.Context) error {
+	var req types.SetStateReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -140,12 +146,12 @@ func (u *user) SetState(c echo.Context) error {
 }
 
 // Active 激活注册
-func (u *user) Active(c echo.Context) error {
-	var req api.ActiveReq
+func (u *User) Active(c echo.Context) error {
+	var req types.ActiveReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.Active(c.Request().Context(), req.Token)
+	err := u.srv.Active(em.GetCtx(c), req.Token)
 	if err != nil {
 		return err
 	}
@@ -153,8 +159,8 @@ func (u *user) Active(c echo.Context) error {
 }
 
 // ChangePassword 修改密码, 用户在登录状态下
-func (u *user) ChangePassword(c echo.Context) error {
-	var req api.ChangePasswordReq
+func (u *User) ChangePassword(c echo.Context) error {
+	var req types.ChangePasswordReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
@@ -163,7 +169,7 @@ func (u *user) ChangePassword(c echo.Context) error {
 	if email == "" {
 		return em.ErrForbidden
 	}
-	err := u.srv.ChangePassword(c.Request().Context(), email, req.Old, req.New)
+	err := u.srv.ChangePassword(em.GetCtx(c), email, req.Old, req.New)
 	if err != nil {
 		return err
 	}
@@ -171,12 +177,12 @@ func (u *user) ChangePassword(c echo.Context) error {
 }
 
 // ResetPassword 用户忘记密码后重置密码，非登录状态
-func (u *user) ResetPassword(c echo.Context) error {
-	var req api.ResetPasswordReq
+func (u *User) ResetPassword(c echo.Context) error {
+	var req types.ResetPasswordReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.ResetPassword(c.Request().Context(), req.Password, req.Token)
+	err := u.srv.ResetPassword(em.GetCtx(c), req.Password, req.Token)
 	if err != nil {
 		return err
 	}
@@ -184,12 +190,12 @@ func (u *user) ResetPassword(c echo.Context) error {
 }
 
 // SendEmail 发送激活或重置密码邮件
-func (u *user) SendEmail(c echo.Context) error {
-	var req api.SendEmailReq
+func (u *User) SendEmail(c echo.Context) error {
+	var req types.SendEmailReq
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.SendMail(c.Request().Context(), req.Email, req.Type, req.URL)
+	err := u.srv.SendMail(em.GetCtx(c), req.Email, req.Type, req.URL)
 	if err != nil {
 		return err
 	}
@@ -197,7 +203,7 @@ func (u *user) SendEmail(c echo.Context) error {
 }
 
 // 设置session
-func (u *user) setSession(c echo.Context, user *model.User) {
+func (u *User) setSession(c echo.Context, user *model.User) {
 	sess, _ := session.Get("session", c)
 	sess.Values = map[interface{}]interface{}{
 		"email":  user.Email,
@@ -227,7 +233,7 @@ func (u *user) setSession(c echo.Context, user *model.User) {
 }
 
 // oauth2 登录, 绑定随机字符串到当前会话, 防止 csrf
-func (u *user) setStateSession(c echo.Context, state, url string) {
+func (u *User) setStateSession(c echo.Context, state, url string) {
 	sess, _ := session.Get("_state", c)
 	sess.Options = &sessions.Options{
 		Path:     viper.GetString("session.path"),

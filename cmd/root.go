@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/router"
+	"git.happyxhw.cn/happyxhw/iself/service"
 )
 
 var (
@@ -64,5 +64,5 @@ func start() {
 			Encoder: viper.GetString("log.encoder")},
 		zap.AddCallerSkip(1), zap.AddCaller())
 
-	router.Serve()
+	service.Serve()
 }

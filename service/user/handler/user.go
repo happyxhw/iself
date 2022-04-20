@@ -1,4 +1,4 @@
-package service
+package handler
 
 import (
 	"bytes"
@@ -78,20 +78,21 @@ func NewUser(opt *UserOption) *User {
 		db:         opt.DB,
 		rdb:        opt.RDB,
 		oauth2Conf: opt.Oauth2Conf,
-		tokenSrv:   &Token{rdb: opt.RDB},
+		tokenSrv:   &Token{RDB: opt.RDB},
 		ma:         opt.Ma,
 		aesKey:     []byte(opt.AesKey),
 	}
 }
 
-func (u *User) Info(_ context.Context, id int64, source string) (*model.User, *em.Error) {
+func (u *User) Info(ctx context.Context, id int64, source string) (*model.User, error) {
 	var dbUser model.User
 	var query *gorm.DB
 	if source == "" {
-		query = u.db.Select("id, email, name, avatar_url").Where("id = ?", id)
+		query = u.db.WithContext(ctx).Select("id, email, name, avatar_url").Where("id = ?", id)
 	} else {
 		// TODO
-		query = u.db.Model(&model.UserOauth2{}).Select("id, avatar_url").Where("source_id = ? AND source = ?", id, source)
+		query = u.db.WithContext(ctx).
+			Model(&model.UserOauth2{}).Select("id, avatar_url").Where("source_id = ? AND source = ?", id, source)
 	}
 	err := query.Find(&dbUser).Error
 	if err != nil {
@@ -103,10 +104,10 @@ func (u *User) Info(_ context.Context, id int64, source string) (*model.User, *e
 
 // SignUp 注册用户
 // oauth2 用户后面可通过应用内重置密码的方式设置密码
-func (u *User) SignUp(ctx context.Context, redirectURL string, user *model.User) *em.Error {
+func (u *User) SignUp(ctx context.Context, redirectURL string, user *model.User) error {
 	// 校验用户是否存在
 	var dbUser model.User
-	err := u.db.Select("id").Where("email = ?", user.Email).Find(&dbUser).Error
+	err := u.db.WithContext(ctx).Select("id").Where("email = ?", user.Email).Find(&dbUser).Error
 	if err != nil {
 		return em.ErrDB.Wrap(err)
 	}
@@ -118,20 +119,20 @@ func (u *User) SignUp(ctx context.Context, redirectURL string, user *model.User)
 	user.Password = string(passwordByte)
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
-	if errDB := u.db.Create(&user).Error; errDB != nil {
+	if errDB := u.db.WithContext(ctx).Create(&user).Error; errDB != nil {
 		return em.ErrDB.Wrap(errDB)
 	}
 	emErr := u.SendMail(ctx, user.Email, "active", redirectURL)
 	if emErr != nil {
-		userLogger.Error("send active email", zap.Error(err))
+		userLogger.Error("send active email", zap.Error(err), log.Ctx(ctx))
 	}
 	return nil
 }
 
 // SignIn 用户登录
-func (u *User) SignIn(_ context.Context, user *model.User) (*model.User, *em.Error) {
+func (u *User) SignIn(ctx context.Context, user *model.User) (*model.User, error) {
 	var dbUser model.User
-	err := u.db.Select("id, email, password, active").Where("email = ?", user.Email).Find(&dbUser).Error
+	err := u.db.WithContext(ctx).Select("id, email, password, active").Where("email = ?", user.Email).Find(&dbUser).Error
 	if err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
@@ -144,7 +145,7 @@ func (u *User) SignIn(_ context.Context, user *model.User) (*model.User, *em.Err
 }
 
 // SignInByOauth2 oauth2 登录
-func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.UserOauth2, *em.Error) {
+func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.UserOauth2, error) {
 	conf, ok := u.oauth2Conf[source]
 	if !ok {
 		return nil, ErrOauth2Source
@@ -164,12 +165,12 @@ func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.
 	if userInfo == nil || userInfo.SourceID == 0 {
 		return nil, ErrGetOauth2User
 	}
-	if saveErr := u.tokenSrv.SaveToken(token, source, userInfo.SourceID); saveErr != nil {
+	if saveErr := u.tokenSrv.SaveToken(ctx, token, source, userInfo.SourceID); saveErr != nil {
 		return nil, em.ErrRedis.Wrap(err)
 	}
 
 	var uo model.UserOauth2
-	err = u.db.Select("id").
+	err = u.db.WithContext(ctx).Select("id").
 		Where("source_id = ? AND source = ?", userInfo.SourceID, source).Find(&uo).Error
 	if err != nil {
 		return nil, em.ErrDB.Wrap(err)
@@ -178,7 +179,7 @@ func (u *User) SignInByOauth2(ctx context.Context, source, code string) (*model.
 		return userInfo, nil
 	}
 
-	if err := u.db.Create(userInfo).Error; err != nil {
+	if err := u.db.WithContext(ctx).Create(userInfo).Error; err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
 
@@ -208,7 +209,7 @@ func (u *User) GetUserInfo(ctx context.Context, source string, cli *http.Client)
 }
 
 // Active 注册激活
-func (u *User) Active(ctx context.Context, token string) *em.Error {
+func (u *User) Active(ctx context.Context, token string) error {
 	decrypted, err := u.decryptToken(token)
 	if err != nil {
 		return ErrActive
@@ -228,7 +229,7 @@ func (u *User) Active(ctx context.Context, token string) *em.Error {
 		"active":     1,
 		"updated_at": time.Now(),
 	}
-	err = u.db.Model(&model.User{}).Where("email = ?", items[0]).Updates(updatedMap).Error
+	err = u.db.WithContext(ctx).Model(&model.User{}).Where("email = ?", items[0]).Updates(updatedMap).Error
 	if err != nil {
 		return em.ErrDB.Wrap(err)
 	}
@@ -238,7 +239,7 @@ func (u *User) Active(ctx context.Context, token string) *em.Error {
 }
 
 // SendMail 发送注册激活、重置密码邮件
-func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL string) *em.Error {
+func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL string) error {
 	freqKey, tokenKey := "active_freq:%s", "active:%s" //nolint:gosec
 	if emailType == "reset" {
 		freqKey, tokenKey = "reset_freq:%s", "reset:%s" //nolint:gosec
@@ -253,10 +254,10 @@ func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL strin
 	var err error
 	if emailType == "active" {
 		// 校验用户是否存在或已经激活
-		err = u.db.Select("id").Where("email = ? AND active = ?", email, 0).Find(&dbUser).Error
+		err = u.db.WithContext(ctx).Select("id").Where("email = ? AND active = ?", email, 0).Find(&dbUser).Error
 	} else {
 		// 未激活用户也可以重置
-		err = u.db.Select("id").Where("email = ? ", email).Find(&dbUser).Error
+		err = u.db.WithContext(ctx).Select("id").Where("email = ? ", email).Find(&dbUser).Error
 	}
 	if err != nil {
 		return em.ErrDB.Wrap(err)
@@ -266,7 +267,7 @@ func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL strin
 	}
 
 	// 有效期 30 分钟
-	token := util.GenerateToken(16)
+	token := util.NanoID(16)
 	key = fmt.Sprintf(tokenKey, email)
 	// 失效原来的 token
 	err = u.rdb.Set(ctx, key, token, time.Minute*30).Err()
@@ -288,9 +289,9 @@ func (u *User) SendMail(ctx context.Context, email, emailType, redirectURL strin
 }
 
 // ChangePassword 更新密码
-func (u *User) ChangePassword(_ context.Context, email, oldPass, newPass string) *em.Error {
+func (u *User) ChangePassword(ctx context.Context, email, oldPass, newPass string) error {
 	var dbUser model.User
-	err := u.db.Select("id, password").Where("email = ? AND active = ?", email, 1).Find(&dbUser).Error
+	err := u.db.WithContext(ctx).Select("id, password").Where("email = ? AND active = ?", email, 1).Find(&dbUser).Error
 	if err != nil {
 		return em.ErrDB.Wrap(err)
 	}
@@ -304,7 +305,7 @@ func (u *User) ChangePassword(_ context.Context, email, oldPass, newPass string)
 			"password":   string(passwordByte),
 			"updated_at": time.Now(),
 		}
-		err := u.db.Model(&model.User{}).Where("email = ?", email).Updates(updatedMap).Error
+		err := u.db.WithContext(ctx).Model(&model.User{}).Where("email = ?", email).Updates(updatedMap).Error
 		if err != nil {
 			return em.ErrDB.Wrap(err)
 		}
@@ -313,7 +314,7 @@ func (u *User) ChangePassword(_ context.Context, email, oldPass, newPass string)
 }
 
 // ResetPassword 重置密码
-func (u *User) ResetPassword(ctx context.Context, password, token string) *em.Error {
+func (u *User) ResetPassword(ctx context.Context, password, token string) error {
 	encrypted, err := u.decryptToken(token)
 	if err != nil {
 		return ErrResetPassword
@@ -334,7 +335,7 @@ func (u *User) ResetPassword(ctx context.Context, password, token string) *em.Er
 		"password":   string(passwordByte),
 		"updated_at": time.Now(),
 	}
-	err = u.db.Model(&model.User{}).Where("email = ?", items[0]).Updates(updatedMap).Error
+	err = u.db.WithContext(ctx).Model(&model.User{}).Where("email = ?", items[0]).Updates(updatedMap).Error
 	if err != nil {
 		return em.ErrDB.Wrap(err)
 	}

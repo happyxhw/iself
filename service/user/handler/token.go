@@ -1,4 +1,4 @@
-package service
+package handler
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
-	"git.happyxhw.cn/happyxhw/gin-starter/pkg/log"
+	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 )
@@ -23,29 +23,29 @@ var (
 
 // Token srv
 type Token struct {
-	rdb *redis.Client
+	RDB *redis.Client
 }
 
 // SaveToken 保存到redis
-func (t *Token) SaveToken(token *oauth2.Token, source string, id int64) error {
+func (t *Token) SaveToken(ctx context.Context, token *oauth2.Token, source string, id int64) error {
 	data, err := json.Marshal(token)
 	if err != nil {
 		return err
 	}
 	key := fmt.Sprintf("oauth2:%s:%d", source, id)
-	if err := t.rdb.Set(context.TODO(), key, data, 0).Err(); err != nil {
-		log.Error("save token to redis", zap.Error(err))
+	if err := t.RDB.Set(context.TODO(), key, data, 0).Err(); err != nil {
+		log.Error("save token to redis", zap.Error(err), log.Ctx(ctx))
 		return err
 	}
 	return nil
 }
 
 // GetToken 获取 access token，自动刷新
-func (t *Token) GetToken(source string, id int64, conf *oauth2.Config) (*oauth2.Token, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*30)
+func (t *Token) GetToken(ctx context.Context, source string, id int64, conf *oauth2.Config) (*oauth2.Token, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 	key := fmt.Sprintf("oauth2:%s:%d", source, id)
-	result, err := t.rdb.Get(ctx, key).Result()
+	result, err := t.RDB.Get(ctx, key).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (t *Token) GetToken(source string, id int64, conf *oauth2.Config) (*oauth2.
 		return nil, err
 	}
 	if newToken.AccessToken != token.AccessToken {
-		_ = t.SaveToken(newToken, source, id)
+		_ = t.SaveToken(ctx, newToken, source, id)
 	}
 
 	return newToken, nil

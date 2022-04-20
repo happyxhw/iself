@@ -1,4 +1,4 @@
-package router
+package service
 
 import (
 	"context"
@@ -14,8 +14,8 @@ import (
 	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/router/strava"
-	"git.happyxhw.cn/happyxhw/iself/router/user"
+	stravaRouter "git.happyxhw.cn/happyxhw/iself/service/strava"
+	userRouter "git.happyxhw.cn/happyxhw/iself/service/user"
 )
 
 // Serve start web serve
@@ -61,6 +61,6 @@ func newRouter() *echo.Echo {
 }
 
 func initRouter(e *echo.Echo) {
-	user.InitRouter(e)
-	strava.InitRouter(e)
+	userRouter.InitRouter(e)
+	stravaRouter.InitRouter(e)
 }

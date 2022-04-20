@@ -1,12 +1,14 @@
 package log
 
 import (
+	"context"
 	"io"
 	"log"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -172,4 +174,9 @@ func GetLogger() *zap.Logger {
 // entries. Applications should take care to call Sync before exiting.
 func Sync() {
 	_ = appLogger.Sync()
+}
+
+func Ctx(ctx context.Context) zap.Field {
+	reqID, _ := ctx.Value(echo.HeaderXRequestID).(string)
+	return zap.String(echo.HeaderXRequestID, reqID)
 }

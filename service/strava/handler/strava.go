@@ -1,4 +1,4 @@
-package service
+package handler
 
 import (
 	"context"
@@ -15,16 +15,17 @@ import (
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 
-	"git.happyxhw.cn/happyxhw/iself/api"
 	"git.happyxhw.cn/happyxhw/iself/model"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	sm "git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"git.happyxhw.cn/happyxhw/iself/service/strava/types"
+	"git.happyxhw.cn/happyxhw/iself/service/user/handler"
 )
 
 var (
 	// ErrStrava 获取 strava 数据错误
-	ErrStrava = em.NewError(http.StatusServiceUnavailable, 60201, "strava api")
+	ErrStrava = em.NewError(http.StatusServiceUnavailable, 60201, "strava types")
 )
 
 const (
@@ -38,7 +39,7 @@ type MaxMinID struct {
 
 // Strava service
 type Strava struct {
-	tokenSrv *Token
+	tokenSrv *handler.Token
 
 	db  *gorm.DB
 	rdb *redis.Client
@@ -60,13 +61,13 @@ func NewStrava(opt *StravaOption) *Strava {
 	return &Strava{
 		db:         opt.DB,
 		rdb:        opt.RDB,
-		tokenSrv:   &Token{rdb: opt.RDB},
+		tokenSrv:   &handler.Token{RDB: opt.RDB},
 		oauth2Conf: opt.Oauth2Conf,
 	}
 }
 
 // ActivityList get activity list
-func (s *Strava) ActivityList(_ context.Context, req *api.ActivityListReq, sourceID int64) (interface{}, *em.Error) {
+func (s *Strava) ActivityList(ctx context.Context, req *types.ActivityListReq, sourceID int64) (interface{}, error) {
 	var results []*model.ActivityDetail
 	fields := []string{
 		"id", "name", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "elev_high",
@@ -74,8 +75,8 @@ func (s *Strava) ActivityList(_ context.Context, req *api.ActivityListReq, sourc
 		"average_heartrate",
 	}
 	limit := req.Limit
-	query := s.db.Select(fields).Where("athlete_id = ?", sourceID).Limit(limit)
-	if req.Type != api.All {
+	query := s.db.WithContext(ctx).Select(fields).Where("athlete_id = ?", sourceID).Limit(limit)
+	if req.Type != types.All {
 		query = query.Where("type = ?", req.Type)
 	}
 	var reverse bool
@@ -96,9 +97,9 @@ func (s *Strava) ActivityList(_ context.Context, req *api.ActivityListReq, sourc
 	}
 	// 是否有下一页或上一页
 	var tmp MaxMinID
-	query = s.db.Model(&model.ActivityDetail{}).Select("MAX(id) AS max_id, MIN(id) AS min_id").
+	query = s.db.WithContext(ctx).Model(&model.ActivityDetail{}).Select("MAX(id) AS max_id, MIN(id) AS min_id").
 		Where("athlete_id = ?", sourceID)
-	if req.Type != api.All {
+	if req.Type != types.All {
 		query = query.Where("type = ?", req.Type)
 	}
 	err = query.Find(&tmp).Error
@@ -131,7 +132,7 @@ func (s *Strava) ActivityList(_ context.Context, req *api.ActivityListReq, sourc
 }
 
 // ActivityPageList get activity list
-func (s *Strava) ActivityPageList(_ context.Context, req *api.ActivityListPageReq, sourceID int64) (interface{}, *em.Error) {
+func (s *Strava) ActivityPageList(ctx context.Context, req *types.ActivityListPageReq, sourceID int64) (interface{}, error) {
 	fields := []string{
 		"id", "name", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "elev_high",
 		"elev_low", "type", "start_date_local", "average_speed", "max_speed", "max_heartrate",
@@ -139,8 +140,8 @@ func (s *Strava) ActivityPageList(_ context.Context, req *api.ActivityListPageRe
 	}
 	limit := req.PageSize
 	offset := (req.Page - 1) * req.PageSize
-	query := s.db.Model(&model.ActivityDetail{}).Where("athlete_id = ?", sourceID)
-	if req.Type != api.All {
+	query := s.db.WithContext(ctx).Model(&model.ActivityDetail{}).Where("athlete_id = ?", sourceID)
+	if req.Type != types.All {
 		query = query.Where("type = ?", req.Type)
 	}
 	var total int64
@@ -158,7 +159,7 @@ func (s *Strava) ActivityPageList(_ context.Context, req *api.ActivityListPageRe
 		return nil, em.ErrDB.Wrap(err)
 	}
 	var results []*model.ActivityDetail
-	err = s.db.Select(fields).Where("id IN (?)", ids).Order("id desc").Find(&results).Error
+	err = s.db.WithContext(ctx).Select(fields).Where("id IN (?)", ids).Order("id desc").Find(&results).Error
 	if err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
@@ -173,14 +174,14 @@ func (s *Strava) ActivityPageList(_ context.Context, req *api.ActivityListPageRe
 	}, nil
 }
 
-func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, *em.Error) {
+func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, error) {
 	fields := []string{
 		"id", "name", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "elev_high",
 		"elev_low", "type", "start_date_local", "average_speed", "max_speed", "max_heartrate", "average_heartrate",
 		"created_at", "polyline", "calories",
 	}
 	var activity model.ActivityDetail
-	err := s.db.Select(fields).Where("id = ? AND athlete_id = ?", id, sourceID).Find(&activity).Error
+	err := s.db.WithContext(ctx).Select(fields).Where("id = ? AND athlete_id = ?", id, sourceID).Find(&activity).Error
 	if err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
@@ -190,12 +191,12 @@ func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, *e
 
 	var stream model.ActivityStream
 	fields = []string{"id", "distance", "heartrate", "altitude", "velocity_smooth"}
-	err = s.db.Select(fields).Where("id = ?", id).Find(&stream).Error
+	err = s.db.WithContext(ctx).Select(fields).Where("id = ?", id).Find(&stream).Error
 	if err != nil {
 		return nil, em.ErrDB.Wrap(err)
 	}
 
-	var streamSet sm.StreamSet
+	var streamSet strava.StreamSet
 	_ = json.Unmarshal([]byte(stream.Distance), &streamSet.Distance)
 	_ = json.Unmarshal([]byte(stream.VelocitySmooth), &streamSet.VelocitySmooth)
 	_ = json.Unmarshal([]byte(stream.Heartrate), &streamSet.Heartrate)
@@ -234,7 +235,7 @@ var fractionMap = map[string]float64{
 	"distance": 1000,
 }
 
-func (s *Strava) SummaryStatsNow(ctx context.Context, req *api.StatsNowReq, sourceID int64) (*api.Stats, *em.Error) {
+func (s *Strava) SummaryStatsNow(ctx context.Context, req *types.StatsNowReq, sourceID int64) (*types.Stats, error) {
 	now := time.Now()
 	year, month, _ := now.Date()
 	week := int(now.Weekday())
@@ -244,22 +245,22 @@ func (s *Strava) SummaryStatsNow(ctx context.Context, req *api.StatsNowReq, sour
 
 	var tmp stats
 	err := func() error {
-		if err := s.db.Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS week", req.Method, req.Field)).
+		if err := s.db.WithContext(ctx).Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS week", req.Method, req.Field)).
 			Where("athlete_id = ? AND type = ? AND start_date_local >= ?", sourceID, req.Type, weekStart).
 			Find(&tmp).Error; err != nil {
 			return err
 		}
-		if err := s.db.Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS month", req.Method, req.Field)).
+		if err := s.db.WithContext(ctx).Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS month", req.Method, req.Field)).
 			Where("athlete_id = ? AND type = ? AND start_date_local >= ?", sourceID, req.Type, monthStart).
 			Find(&tmp).Error; err != nil {
 			return err
 		}
-		if err := s.db.Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS year", req.Method, req.Field)).
+		if err := s.db.WithContext(ctx).Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS year", req.Method, req.Field)).
 			Where("athlete_id = ? AND type = ? AND start_date_local >= ?", sourceID, req.Type, yearStart).
 			Find(&tmp).Error; err != nil {
 			return err
 		}
-		if err := s.db.Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS all", req.Method, req.Field)).
+		if err := s.db.WithContext(ctx).Model(&model.ActivityDetail{}).Select(fmt.Sprintf("%s(%s) AS all", req.Method, req.Field)).
 			Where("athlete_id = ? AND type = ?", sourceID, req.Type).
 			Find(&tmp).Error; err != nil {
 			return err
@@ -271,7 +272,7 @@ func (s *Strava) SummaryStatsNow(ctx context.Context, req *api.StatsNowReq, sour
 	}
 
 	var goals []*model.Goal
-	err = s.db.Select("freq, value").
+	err = s.db.WithContext(ctx).Select("freq, value").
 		Where("athlete_id = ? AND type = ? AND field = ?", sourceID, req.Type, req.Field).
 		Find(&goals).Error
 	if err != nil {
@@ -285,7 +286,7 @@ func (s *Strava) SummaryStatsNow(ctx context.Context, req *api.StatsNowReq, sour
 	if v, ok := fractionMap[req.Field]; ok {
 		fraction = v
 	}
-	r := api.Stats{
+	r := types.Stats{
 		Type: req.Type,
 		Unit: unitMap[req.Field],
 		All:  fmt.Sprintf("%.0f", tmp.All/fraction),
@@ -302,12 +303,12 @@ func (s *Strava) SummaryStatsNow(ctx context.Context, req *api.StatsNowReq, sour
 	if int(goalMap["week"]) == 0 {
 		r.WeekGoal, r.WeekProcess = notExistsLabel, notExistsLabel
 	} else {
-		r.WeekProcess = fmt.Sprintf("%.0f", tmp.Week/goalMap["week"]/100)
+		r.WeekProcess = fmt.Sprintf("%.0f", tmp.Week/goalMap["week"]*100)
 	}
 	if int(goalMap["month"]) == 0 {
 		r.MonthGoal, r.MonthProcess = notExistsLabel, notExistsLabel
 	} else {
-		r.MonthProcess = fmt.Sprintf("%.0f", tmp.Month/goalMap["month"]/100)
+		r.MonthProcess = fmt.Sprintf("%.0f", tmp.Month/goalMap["month"]*100)
 	}
 	if int(goalMap["year"]) == 0 {
 		r.YearGoal, r.YearProcess = notExistsLabel, notExistsLabel
@@ -324,12 +325,12 @@ const (
 )
 
 // DateChart 以日期为横轴的统计数据：近一个月，近三个月，近半年，全年 by week || month || year
-func (s *Strava) DateChart(ctx context.Context, req *api.DateChartReq, sourceID int64) (echo.Map, *em.Error) {
+func (s *Strava) DateChart(ctx context.Context, req *types.DateChartReq, sourceID int64) (echo.Map, error) {
 	valMap := make(map[string]float64)
 	now := time.Now()
 	startDate, start := findStartDate(req, now)
 
-	rows, err := s.db.Model(&model.ActivityDetail{}).
+	rows, err := s.db.WithContext(ctx).Model(&model.ActivityDetail{}).
 		Select(
 			fmt.Sprintf("%s(%s) AS %s, date_trunc('%s', start_date_local) AS %s",
 				req.Method, req.Field, req.Field, req.Freq, req.Freq),
@@ -404,11 +405,11 @@ func findMarker(data []float64) (max, min, avg float64, maxIndex, minIndex int) 
 	return max, min, avg, maxIndex, minIndex
 }
 
-func findStartDate(req *api.DateChartReq, now time.Time) (string, time.Time) {
+func findStartDate(req *types.DateChartReq, now time.Time) (string, time.Time) {
 	var dateStart string
 	var start time.Time
 	switch req.Freq {
-	case api.Week:
+	case types.Week:
 		if req.Size > limitWeek {
 			req.Size = limitWeek
 		}
@@ -416,18 +417,18 @@ func findStartDate(req *api.DateChartReq, now time.Time) (string, time.Time) {
 		start = now.AddDate(0, 0, -7*req.Size)
 		week := start.Weekday()
 		if week != time.Monday {
-			start = start.AddDate(0, 0, int(time.Monday)-int(week))
+			start = start.AddDate(0, 0, int(time.Monday)-int(week)+1)
 		}
 		year, month, day := start.AddDate(0, -req.Size, 0).Date()
 		dateStart = fmt.Sprintf("%d-%d-%d", year, month, day)
-	case api.Month:
+	case types.Month:
 		if req.Size > limitMonth {
 			req.Size = limitMonth
 		}
 		start = now.AddDate(0, -req.Size, 0)
 		year, month, _ := start.Date()
 		dateStart = fmt.Sprintf("%d-%d-01", year, month)
-	case api.Year:
+	case types.Year:
 		if req.Size > limitYear {
 			req.Size = limitYear
 		}
@@ -439,7 +440,7 @@ func findStartDate(req *api.DateChartReq, now time.Time) (string, time.Time) {
 	return dateStart, start
 }
 
-func makeChartData(req *api.DateChartReq, valMap map[string]float64, start, now time.Time) (date []string, value []float64) {
+func makeChartData(req *types.DateChartReq, valMap map[string]float64, start, now time.Time) (date []string, value []float64) {
 	var fraction float64 = 1
 	if v, ok := fractionMap[req.Field]; ok {
 		fraction = v
@@ -447,17 +448,17 @@ func makeChartData(req *api.DateChartReq, valMap map[string]float64, start, now 
 	for now.After(start) {
 		var key string
 		switch req.Freq {
-		case api.Week:
+		case types.Week:
 			key = start.Format("2006-01-02")
 			date = append(date, start.Format("01-02"))
 			start = start.AddDate(0, 0, 7)
-		case api.Month:
+		case types.Month:
 			// do not use time.AddDate for month + 1
 			key = start.Format("2006-01") + "-01"
 			year, month, _ := start.Date()
 			date = append(date, start.Format("01"))
 			start = time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
-		case api.Year:
+		case types.Year:
 			key = start.Format("2006") + "-01-01"
 			date = append(date, start.Format("2006"))
 			start = start.AddDate(1, 0, 0)
@@ -490,14 +491,14 @@ func transformVelocity(vel float64, activityType string) float64 {
 }
 
 // Push from strava event
-func (s *Strava) Push(ctx context.Context, event *sm.SubscriptionEvent) *em.Error {
+func (s *Strava) Push(ctx context.Context, event *strava.SubscriptionEvent) error {
 	ups, err := json.Marshal(event.Updates)
 	if err != nil {
 		return em.ErrBadRequest.Wrap(err)
 	}
 
 	var push model.PushEvent
-	err = s.db.Select("id, status").Where("object_id = ?", event.ObjectID).Find(&push).Error
+	err = s.db.WithContext(ctx).Select("id, status").Where("object_id = ?", event.ObjectID).Find(&push).Error
 	if err != nil {
 		return em.ErrDB.Wrap(err)
 	}
@@ -513,7 +514,7 @@ func (s *Strava) Push(ctx context.Context, event *sm.SubscriptionEvent) *em.Erro
 			CreatedAt:  now,
 			UpdatedAt:  now,
 		}
-		err = s.db.Where("object_id = ?", event.ObjectID).Create(&newPush).Error
+		err = s.db.WithContext(ctx).Where("object_id = ?", event.ObjectID).Create(&newPush).Error
 		if err != nil {
 			return em.ErrDB.Wrap(err)
 		}
@@ -521,7 +522,7 @@ func (s *Strava) Push(ctx context.Context, event *sm.SubscriptionEvent) *em.Erro
 	if push.Status != 1 {
 		emErr := s.push(ctx, event)
 		if emErr != nil {
-			log.Error("strava push", zap.Int64("object_id", event.ObjectID))
+			log.Error("strava push", zap.Int64("object_id", event.ObjectID), log.Ctx(ctx))
 			return emErr
 		}
 	}
@@ -530,7 +531,7 @@ func (s *Strava) Push(ctx context.Context, event *sm.SubscriptionEvent) *em.Erro
 }
 
 // push 处理推送
-func (s *Strava) push(ctx context.Context, event *sm.SubscriptionEvent) *em.Error {
+func (s *Strava) push(ctx context.Context, event *strava.SubscriptionEvent) error {
 	log.Info("strava push",
 		zap.Int64("object_id", event.ObjectID), zap.Int64("owner_id", event.OwnerID),
 		zap.String("aspect_type", event.AspectType), zap.String("object_type", event.ObjectType))
@@ -543,7 +544,7 @@ func (s *Strava) push(ctx context.Context, event *sm.SubscriptionEvent) *em.Erro
 	return em.ErrBadRequest.Msg("unknown object type")
 }
 
-func (s *Strava) activityPush(ctx context.Context, event *sm.SubscriptionEvent) *em.Error {
+func (s *Strava) activityPush(ctx context.Context, event *strava.SubscriptionEvent) error {
 	switch event.AspectType {
 	case "create":
 		return s.activityCreate(ctx, event)
@@ -553,16 +554,16 @@ func (s *Strava) activityPush(ctx context.Context, event *sm.SubscriptionEvent) 
 	return em.ErrBadRequest.Msg("unknown aspect type")
 }
 
-func (s *Strava) athletePush(ctx context.Context, event *sm.SubscriptionEvent) *em.Error {
+func (s *Strava) athletePush(ctx context.Context, event *strava.SubscriptionEvent) error {
 	return nil
 }
 
-func (s *Strava) activityCreate(ctx context.Context, event *sm.SubscriptionEvent) *em.Error {
-	token, err := s.tokenSrv.GetToken("strava", event.OwnerID, s.oauth2Conf)
+func (s *Strava) activityCreate(ctx context.Context, event *strava.SubscriptionEvent) error {
+	token, err := s.tokenSrv.GetToken(ctx, "strava", event.OwnerID, s.oauth2Conf)
 	if err != nil {
-		return ErrGetToken.Wrap(err)
+		return handler.ErrGetToken.Wrap(err)
 	}
-	stravaCli := sm.NewClient(s.oauth2Conf.Client(ctx, token))
+	stravaCli := strava.NewClient(s.oauth2Conf.Client(ctx, token))
 	resp, body, err := stravaCli.Activity.Activity(ctx, event.ObjectID)
 	if err != nil {
 		return ErrStrava.Wrap(err)
@@ -579,7 +580,7 @@ func (s *Strava) activityCreate(ctx context.Context, event *sm.SubscriptionEvent
 
 	activity, stream := formatActivityData(resp, streamResp, event)
 
-	err = s.db.Transaction(func(tx *gorm.DB) error {
+	err = s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if dbErr := tx.Create(&raw).Error; dbErr != nil {
 			return dbErr
 		}
@@ -603,7 +604,7 @@ func (s *Strava) activityCreate(ctx context.Context, event *sm.SubscriptionEvent
 	return nil
 }
 
-func formatActivityData(resp *sm.DetailedActivity, streamResp *sm.StreamSet, event *sm.SubscriptionEvent,
+func formatActivityData(resp *strava.DetailedActivity, streamResp *strava.StreamSet, event *strava.SubscriptionEvent,
 ) (*model.ActivityDetail, *model.ActivityStream) {
 	splitsMetric, _ := json.Marshal(resp.SplitsMetric)
 	bestEfforts, _ := json.Marshal(resp.BestEfforts)

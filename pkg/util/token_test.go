@@ -6,5 +6,5 @@ import (
 )
 
 func TestGenerateToken(t *testing.T) {
-	fmt.Println(GenerateToken(8))
+	fmt.Println(NanoID(8))
 }

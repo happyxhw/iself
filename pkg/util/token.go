@@ -2,14 +2,30 @@ package util
 
 import (
 	"crypto/rand"
-	"encoding/hex"
 )
 
-// GenerateToken 生成 token
-func GenerateToken(length int) string {
-	b := make([]byte, length)
-	if _, err := rand.Read(b); err != nil {
-		return ""
+/*
+Refer to go-nanoid project:
+https://github.com/matoous/go-nanoid
+*/
+
+const defaultSize = 32
+
+// defaultAlphabet is the alphabet used for ID characters by default.
+var defaultAlphabet = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func NanoID(length int) string {
+	if length <= 0 {
+		length = defaultSize
 	}
-	return hex.EncodeToString(b)
+	bytes := make([]byte, length)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		panic(err)
+	}
+	id := make([]rune, length)
+	for i := 0; i < length; i++ {
+		id[i] = defaultAlphabet[bytes[i]&61]
+	}
+	return string(id[:length])
 }

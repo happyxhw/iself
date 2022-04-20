@@ -6,28 +6,26 @@ import (
 
 	"git.happyxhw.cn/happyxhw/iself/component"
 	"git.happyxhw.cn/happyxhw/iself/pkg/em"
-	"git.happyxhw.cn/happyxhw/iself/service"
+	"git.happyxhw.cn/happyxhw/iself/service/strava/controller"
+	"git.happyxhw.cn/happyxhw/iself/service/strava/handler"
 )
 
 // InitRouter 初始化用户路由
 func InitRouter(e *echo.Echo) {
 	g := e.Group("/api/strava")
-	stravaSrvOpt := service.StravaOption{
+	stravaSrvOpt := handler.StravaOption{
 		DB:         component.DB(),
 		RDB:        component.RDB(),
 		Oauth2Conf: component.Oauth2Conf()["strava"],
 		AesKey:     viper.GetString("secure.key"),
 	}
-	srv := service.NewStrava(&stravaSrvOpt)
-	goalSrv := service.NewGoal(component.DB())
-	s := strava{
-		srv:     srv,
-		goalSrv: goalSrv,
-	}
-	router(g, &s)
+	srv := handler.NewStrava(&stravaSrvOpt)
+	goalSrv := handler.NewGoal(component.DB())
+	s := controller.NewStrava(srv, goalSrv)
+	router(g, s)
 }
 
-func router(g *echo.Group, s *strava) {
+func router(g *echo.Group, s *controller.Strava) {
 	g.POST("/push", s.Push)      // 注册
 	g.GET("/push", s.VerifyPush) // verify push
 

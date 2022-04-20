@@ -2,8 +2,10 @@ package em
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap/zapcore"
 )
 
 var _ error = (*Error)(nil)
@@ -60,8 +62,9 @@ func (e *Error) Wrap(err error) *Error {
 		Message:      e.Message,
 		ErrorMessage: e.ErrorMessage,
 	}
+	caller := zapcore.NewEntryCaller(runtime.Caller(1)).TrimmedPath()
 	if err != nil {
-		newErr.ErrorMessage = err.Error()
+		newErr.ErrorMessage = fmt.Sprintf("%s: %s", caller, err.Error())
 	}
 	return &newErr
 }
