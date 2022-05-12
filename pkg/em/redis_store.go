@@ -3,18 +3,18 @@ package em
 import (
 	"bytes"
 	"context"
-	"encoding/base32"
 	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+
+	"git.happyxhw.cn/happyxhw/iself/pkg/util"
 )
 
 /*
@@ -192,7 +192,7 @@ func (s *RedisStore) New(r *http.Request, name string) (*sessions.Session, error
 // Save adds a single session to the response.
 func (s *RedisStore) Save(_ *http.Request, w http.ResponseWriter, session *sessions.Session) error {
 	// Marked for deletion.
-	if session.Options.MaxAge <= 0 {
+	if session.Options.MaxAge < 0 {
 		if err := s.delete(session); err != nil {
 			return err
 		}
@@ -200,8 +200,7 @@ func (s *RedisStore) Save(_ *http.Request, w http.ResponseWriter, session *sessi
 	} else {
 		// Build an alphanumeric key for the redis store.
 		if session.ID == "" {
-			session.ID = strings.TrimRight(
-				base32.StdEncoding.EncodeToString(securecookie.GenerateRandomKey(sessionLen)), "=")
+			session.ID = util.NanoID(sessionLen)
 		}
 		if err := s.save(session); err != nil {
 			return err

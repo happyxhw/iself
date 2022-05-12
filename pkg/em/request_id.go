@@ -30,6 +30,6 @@ func RequestID() echo.MiddlewareFunc {
 	}
 }
 
-func GetCtx(c echo.Context) context.Context {
+func Ctx(c echo.Context) context.Context {
 	return context.WithValue(c.Request().Context(), echo.HeaderXRequestID, c.Get(echo.HeaderXRequestID))
 }

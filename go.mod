@@ -1,6 +1,6 @@
 module git.happyxhw.cn/happyxhw/iself
 
-go 1.17
+go 1.18
 
 require (
 	github.com/google/uuid v1.3.0
@@ -30,6 +30,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

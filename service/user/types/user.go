@@ -14,8 +14,9 @@ type SignUpReq struct {
 
 // SignInReq request
 type SignInReq struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"gte=8,lte=16"`
+	Email      string `json:"email" validate:"required,email"`
+	Password   string `json:"password" validate:"gte=8,lte=16"`
+	RememberMe bool   `json:"remember_me"`
 }
 
 // Oauth2ExchangeReq oauth2 exchange req

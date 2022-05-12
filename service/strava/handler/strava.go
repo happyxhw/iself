@@ -151,7 +151,10 @@ func (s *Strava) ActivityPageList(ctx context.Context, req *types.ActivityListPa
 	}
 
 	if total == 0 {
-		return nil, nil
+		return echo.Map{
+			"total": total,
+			"list":  []*model.ActivityDetail{},
+		}, nil
 	}
 	var ids []int64
 	err = query.Order("id DESC").Limit(limit).Offset(offset).Pluck("id", &ids).Error

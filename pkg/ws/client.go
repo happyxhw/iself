@@ -22,16 +22,16 @@ const (
 	defaultReadLimit = 1024
 )
 
-// Client websocket client, held by stream
+// Client websocket client, held by hub
 type Client struct {
 	conn    *websocket.Conn // websocket conn
 	stopCh  chan struct{}   // signal to stop client
 	onClose func(*Client)   // do func when conn close
 
-	stream *Stream
-	once   sync.Once
-	ch     chan *Msg
-	errCh  chan error
+	hub   *Hub
+	once  sync.Once
+	ch    chan *Msg
+	errCh chan error
 
 	id     string // client id
 	userID int64  // client user id
@@ -39,10 +39,10 @@ type Client struct {
 }
 
 // NewClient return client instance
-func NewClient(conn *websocket.Conn, stream *Stream, id, token string, userID int64, readFunc func([]byte)) *Client {
+func NewClient(conn *websocket.Conn, stream *Hub, id, token string, userID int64, readFunc func([]byte)) *Client {
 	cli := Client{
-		conn:   conn,
-		stream: stream,
+		conn: conn,
+		hub:  stream,
 
 		stopCh: make(chan struct{}, 1),
 		ch:     make(chan *Msg),
@@ -74,7 +74,7 @@ func (c *Client) close() {
 		if c.onClose != nil {
 			c.onClose(c)
 		}
-		c.stream.Remove(c)
+		c.hub.Remove(c)
 		log.Info("client closed", zap.String("id", c.id), zap.Int64("user_id", c.userID))
 	})
 }
@@ -138,7 +138,7 @@ func (c *Client) startPingHandler() {
 	}
 }
 
-func (c *Client) send(msg *Msg) error {
+func (c *Client) Send(msg *Msg) error {
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5) //nolint:gomnd
 	defer cancel()

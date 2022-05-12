@@ -16,6 +16,7 @@ import (
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 	stravaRouter "git.happyxhw.cn/happyxhw/iself/service/strava"
 	userRouter "git.happyxhw.cn/happyxhw/iself/service/user"
+	weatherRouter "git.happyxhw.cn/happyxhw/iself/service/weather"
 )
 
 // Serve start web serve
@@ -63,4 +64,5 @@ func newRouter() *echo.Echo {
 func initRouter(e *echo.Echo) {
 	userRouter.InitRouter(e)
 	stravaRouter.InitRouter(e)
+	weatherRouter.InitRouter(e)
 }

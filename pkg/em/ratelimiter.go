@@ -17,7 +17,7 @@ func IPRateLimit(store limiter.Store, rate limiter.Rate) echo.MiddlewareFunc {
 			// TODO: not login -> ip
 			// login -> user id
 			ip := c.RealIP()
-			limiterCtx, err := ipRateLimiter.Get(GetCtx(c), ip)
+			limiterCtx, err := ipRateLimiter.Get(Ctx(c), ip)
 			if err != nil {
 				return ErrRedis.Wrap(err)
 			}

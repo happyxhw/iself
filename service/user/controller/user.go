@@ -27,9 +27,8 @@ func NewUser(srv *handler.User) *User {
 }
 
 func (u *User) Info(c echo.Context) error {
-	userID, _ := c.Get("id").(int64)
-	source, _ := c.Get("source").(string)
-	dbUser, err := u.srv.Info(em.GetCtx(c), userID, source)
+	uc := em.GetUser(c)
+	dbUser, err := u.srv.Info(em.Ctx(c), uc.ID, uc.Source)
 	if err != nil {
 		return err
 	}
@@ -43,7 +42,7 @@ func (u *User) SignUp(c echo.Context) error {
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.SignUp(em.GetCtx(c), req.ActiveURL, &model.User{
+	err := u.srv.SignUp(em.Ctx(c), req.ActiveURL, &model.User{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
@@ -61,7 +60,7 @@ func (u *User) SignIn(c echo.Context) error {
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	dbUser, err := u.srv.SignIn(em.GetCtx(c), &model.User{
+	dbUser, err := u.srv.SignIn(em.Ctx(c), &model.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -76,7 +75,7 @@ func (u *User) SignIn(c echo.Context) error {
 	}
 
 	// 设置session
-	u.setSession(c, dbUser)
+	u.setSession(c, dbUser, req.RememberMe)
 	return em.OK(c, nil)
 }
 
@@ -85,12 +84,23 @@ func (u *User) SignOut(c echo.Context) error {
 	sess, _ := session.Get("session", c)
 	sess.Options = &sessions.Options{
 		Path:     viper.GetString("session.path"),
-		MaxAge:   0,
+		MaxAge:   -1,
 		Domain:   viper.GetString("session.domain"),
 		Secure:   viper.GetBool("session.secure"),
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
 	}
+	cookie := http.Cookie{
+		Name:     "_csrf",
+		Value:    random.String(32),
+		Path:     "/",
+		Domain:   viper.GetString("session.domain"),
+		MaxAge:   -1,
+		Secure:   viper.GetBool("session.secure"),
+		HttpOnly: false,
+		SameSite: http.SameSiteLaxMode,
+	}
+	c.SetCookie(&cookie)
 	_ = sess.Save(c.Request(), c.Response())
 	err := em.OK(c, nil)
 	return err
@@ -116,7 +126,7 @@ func (u *User) Callback(c echo.Context) error {
 	sess.Options = &sessions.Options{
 		Path:     viper.GetString("session.path"),
 		Domain:   viper.GetString("session.domain"),
-		MaxAge:   0,
+		MaxAge:   -1,
 		Secure:   viper.GetBool("session.secure"),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
@@ -126,11 +136,11 @@ func (u *User) Callback(c echo.Context) error {
 		return handler.ErrOauth2State
 	}
 
-	dbUser, err := u.srv.SignInByOauth2(em.GetCtx(c), req.Source, req.Code)
+	dbUser, err := u.srv.SignInByOauth2(em.Ctx(c), req.Source, req.Code)
 	if err != nil {
 		return err
 	}
-	u.setSession(c, &model.User{ID: dbUser.SourceID, Source: dbUser.Source})
+	u.setSession(c, &model.User{ID: dbUser.SourceID, Source: dbUser.Source}, true)
 	return c.Redirect(http.StatusPermanentRedirect, url)
 }
 
@@ -151,7 +161,7 @@ func (u *User) Active(c echo.Context) error {
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.Active(em.GetCtx(c), req.Token)
+	err := u.srv.Active(em.Ctx(c), req.Token)
 	if err != nil {
 		return err
 	}
@@ -169,7 +179,7 @@ func (u *User) ChangePassword(c echo.Context) error {
 	if email == "" {
 		return em.ErrForbidden
 	}
-	err := u.srv.ChangePassword(em.GetCtx(c), email, req.Old, req.New)
+	err := u.srv.ChangePassword(em.Ctx(c), email, req.Old, req.New)
 	if err != nil {
 		return err
 	}
@@ -182,7 +192,7 @@ func (u *User) ResetPassword(c echo.Context) error {
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.ResetPassword(em.GetCtx(c), req.Password, req.Token)
+	err := u.srv.ResetPassword(em.Ctx(c), req.Password, req.Token)
 	if err != nil {
 		return err
 	}
@@ -195,7 +205,7 @@ func (u *User) SendEmail(c echo.Context) error {
 	if err := em.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.SendMail(em.GetCtx(c), req.Email, req.Type, req.URL)
+	err := u.srv.SendMail(em.Ctx(c), req.Email, req.Type, req.URL)
 	if err != nil {
 		return err
 	}
@@ -203,7 +213,7 @@ func (u *User) SendEmail(c echo.Context) error {
 }
 
 // 设置session
-func (u *User) setSession(c echo.Context, user *model.User) {
+func (u *User) setSession(c echo.Context, user *model.User, rememberMe bool) {
 	sess, _ := session.Get("session", c)
 	sess.Values = map[interface{}]interface{}{
 		"email":  user.Email,
@@ -227,6 +237,9 @@ func (u *User) setSession(c echo.Context, user *model.User) {
 		Secure:   viper.GetBool("session.secure"),
 		HttpOnly: false,
 		SameSite: http.SameSiteLaxMode,
+	}
+	if !rememberMe {
+		sess.Options.MaxAge = 0
 	}
 	c.SetCookie(&cookie)
 	_ = sess.Save(c.Request(), c.Response())

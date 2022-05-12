@@ -5,6 +5,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type User struct {
+	ID     int64
+	Source string
+	Email  string
+}
+
 // AuthRequired middleware
 func AuthRequired() echo.MiddlewareFunc {
 	// 2. Return middleware handler
@@ -18,10 +24,13 @@ func AuthRequired() echo.MiddlewareFunc {
 			id = 19830262
 			source, _ := sess.Values["source"].(string)
 			email, _ := sess.Values["email"].(string)
-			c.Set("id", int64(id))
-			c.Set("source", source)
-			c.Set("email", email)
+			c.Set("user", User{ID: int64(id), Source: source, Email: email})
 			return next(c)
 		}
 	}
+}
+
+func GetUser(c echo.Context) User {
+	u, _ := c.Get("user").(User)
+	return u
 }

@@ -59,9 +59,8 @@ func initCsrf(e *echo.Echo) {
 		CookieName:     "_csrf",
 		CookieDomain:   viper.GetString("session.domain"),
 		CookiePath:     "/",
-		CookieMaxAge:   viper.GetInt("session.max_age"),
 		CookieSecure:   viper.GetBool("session.secure"),
-		CookieHTTPOnly: true,
+		CookieHTTPOnly: false,
 		CookieSameSite: http.SameSiteLaxMode,
 		Skipper: func(c echo.Context) bool {
 			if strings.HasPrefix(c.Path(), "/api/auth") {

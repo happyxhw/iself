@@ -60,7 +60,7 @@ func NewLogger(c *Config, opts ...zap.Option) *zap.Logger {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.RFC3339TimeEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 		EncodeName:     zapcore.FullNameEncoder,
@@ -71,6 +71,7 @@ func NewLogger(c *Config, opts ...zap.Option) *zap.Logger {
 	if c.Encoder == "json" {
 		encoder = zapcore.NewJSONEncoder(encoderConfig)
 	} else {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		encoder = zapcore.NewConsoleEncoder(encoderConfig)
 	}
 	var cores []zapcore.Core

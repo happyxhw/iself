@@ -90,7 +90,7 @@ func (u *User) Info(ctx context.Context, id int64, source string) (*model.User, 
 	if source == "" {
 		query = u.db.WithContext(ctx).Select("id, email, name, avatar_url").Where("id = ?", id)
 	} else {
-		// TODO
+		// TODO add user info
 		query = u.db.WithContext(ctx).
 			Model(&model.UserOauth2{}).Select("id, avatar_url").Where("source_id = ? AND source = ?", id, source)
 	}
