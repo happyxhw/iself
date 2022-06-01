@@ -181,7 +181,7 @@ func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, er
 	fields := []string{
 		"id", "name", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "elev_high",
 		"elev_low", "type", "start_date_local", "average_speed", "max_speed", "max_heartrate", "average_heartrate",
-		"created_at", "polyline", "calories",
+		"created_at", "polyline", "calories", "device_name",
 	}
 	var activity model.ActivityDetail
 	err := s.db.WithContext(ctx).Select(fields).Where("id = ? AND athlete_id = ?", id, sourceID).Find(&activity).Error
@@ -211,6 +211,15 @@ func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, er
 		}
 	}
 	activity.AverageSpeed = transformVelocity(activity.AverageSpeed, activity.Type)
+	// 根据90分位数去除极端配速数据
+	if streamSet.VelocitySmooth != nil {
+		for i, item := range streamSet.VelocitySmooth.Data {
+			if float64(item) > 1.5*activity.AverageSpeed || item == 0 {
+				streamSet.VelocitySmooth.Data[i] = float32(activity.AverageSpeed)
+			}
+		}
+	}
+
 	res := echo.Map{
 		"activity":        activity,
 		"distance":        streamSet.Distance,
@@ -218,6 +227,7 @@ func (s *Strava) Activity(ctx context.Context, id, sourceID int64) (echo.Map, er
 		"heartrate":       streamSet.Heartrate,
 		"altitude":        streamSet.Altitude,
 	}
+
 	return res, nil
 }
 

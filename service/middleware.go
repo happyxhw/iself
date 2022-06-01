@@ -41,7 +41,6 @@ func initGlobalMiddleware(e *echo.Echo) {
 	initPrometheus(e)
 	initSession(e)
 	initCsrf(e)
-	initCors(e)
 }
 
 func initSession(e *echo.Echo) {
@@ -68,15 +67,6 @@ func initCsrf(e *echo.Echo) {
 			}
 			return strings.HasPrefix(c.Path(), "/api/strava/push")
 		},
-	}))
-}
-
-func initCors(e *echo.Echo) {
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"localhost", "ifit.happyxhw.com"},
-		AllowMethods: []string{http.MethodGet},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-		MaxAge:       86400,
 	}))
 }
 
