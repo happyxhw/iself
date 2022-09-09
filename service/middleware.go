@@ -53,7 +53,7 @@ func initSession(e *echo.Echo) {
 func initCsrf(e *echo.Echo) {
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLength:    32,
-		TokenLookup:    "header:X-XSRF-TOKEN",
+		TokenLookup:    "header:X-CSRF-TOKEN",
 		ContextKey:     "csrf",
 		CookieName:     "_csrf",
 		CookieDomain:   viper.GetString("session.domain"),

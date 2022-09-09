@@ -37,7 +37,7 @@ func NewStrava(srv *handler.Strava, goalSrv *handler.Goal) *Strava {
 func (s *Strava) Push(c echo.Context) error {
 	var req strava.SubscriptionEvent
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrBadRequest.Wrap(err)
+		return err
 	}
 	if emErr := s.srv.Push(em.Ctx(c), &req); emErr != nil {
 		return emErr
@@ -68,7 +68,7 @@ func (s *Strava) VerifyPush(c echo.Context) error {
 func (s *Strava) ActivityList(c echo.Context) error {
 	var req types.ActivityListPageReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	if req.PageSize > defaultPageSize || req.PageSize == 0 {
 		req.PageSize = defaultPageSize
@@ -99,7 +99,7 @@ func (s *Strava) Activity(c echo.Context) error {
 func (s *Strava) SummaryStatsNow(c echo.Context) error {
 	var req types.StatsNowReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	uc := em.GetUser(c)
 	result, err := s.srv.SummaryStatsNow(em.Ctx(c), &req, uc.ID)
@@ -113,7 +113,7 @@ func (s *Strava) SummaryStatsNow(c echo.Context) error {
 func (s *Strava) DateChart(c echo.Context) error {
 	var req types.DateChartReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	uc := em.GetUser(c)
 	result, err := s.srv.DateChart(em.Ctx(c), &req, uc.ID)
@@ -127,7 +127,7 @@ func (s *Strava) DateChart(c echo.Context) error {
 func (s *Strava) CreateGoal(c echo.Context) error {
 	var req types.GoalReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	uc := em.GetUser(c)
 	req.SourceID = uc.ID
@@ -141,7 +141,7 @@ func (s *Strava) CreateGoal(c echo.Context) error {
 func (s *Strava) UpdateGoal(c echo.Context) error {
 	var req types.GoalReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	uc := em.GetUser(c)
 	req.SourceID = uc.ID
@@ -155,7 +155,7 @@ func (s *Strava) UpdateGoal(c echo.Context) error {
 func (s *Strava) DeleteGoal(c echo.Context) error {
 	var req types.GoalReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	uc := em.GetUser(c)
 	req.SourceID = uc.ID
@@ -169,7 +169,7 @@ func (s *Strava) DeleteGoal(c echo.Context) error {
 func (s *Strava) QueryGoal(c echo.Context) error {
 	var req types.QueryGoalReq
 	if err := em.Bind(c, &req); err != nil {
-		return em.ErrParam.Wrap(err)
+		return err
 	}
 	uc := em.GetUser(c)
 	req.SourceID = uc.ID
