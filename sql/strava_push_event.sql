@@ -7,12 +7,12 @@ CREATE TYPE strava_aspect AS ENUM ('create', 'update', 'delete');
 DROP TABLE IF EXISTS strava_push_event;
 CREATE TABLE strava_push_event
 (
-    id              bigserial NOT NULL PRIMARY KEY,
-    owner_id        bigint    NOT NULL,
-    aspect_type     aspect    NOT NULL,
-    object_type     object    NOT NULL,
-    object_id       bigint    NOT NULL,
-    event_time      bigint    NOT NULL,
+    id              bigserial       NOT NULL PRIMARY KEY,
+    owner_id        bigint          NOT NULL,
+    aspect_type     strava_aspect   NOT NULL,
+    object_type     strava_object   NOT NULL,
+    object_id       bigint          NOT NULL,
+    event_time      bigint          NOT NULL,
     updates         jsonb,
     status          integer   NOT NULL DEFAULT 0,
 

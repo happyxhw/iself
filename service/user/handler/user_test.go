@@ -351,7 +351,7 @@ func TestUser_SendEmail(t *testing.T) {
 		mailer.EXPECT().Send(email, gomock.Any(), gomock.Any()),
 	)
 
-	err := h.SendEmail(ctx, email, activeEmail, mockURL)
+	err := h.SendEmail(ctx, email, ActiveEmail, mockURL)
 
 	require.NoError(t, err)
 }

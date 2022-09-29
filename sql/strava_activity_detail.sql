@@ -30,7 +30,7 @@ CREATE TABLE strava_activity_detail
 
 -- where id = athlete_id order by start_date_local
 CREATE INDEX strava_activity_idx_athelete ON strava_activity_detail (athlete_id, "type", start_date_local);
-
+CREATE INDEX strava_activity_idx_athelete_date ON strava_activity_detail (athlete_id, start_date_local);
 
 COMMENT ON TABLE strava_activity_detail IS '活动详情表';
 

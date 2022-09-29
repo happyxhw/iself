@@ -32,6 +32,10 @@ type User struct {
 	srv             *handler.User
 	oauth2xProvider map[string]oauth2x.Oauth2x
 	sessConfig      *SessionConfig
+
+	homeURL   string
+	activeURL string
+	resetURL  string
 }
 
 func NewUser(srv *handler.User, oauth2xProvider map[string]oauth2x.Oauth2x) *User {
@@ -41,6 +45,10 @@ func NewUser(srv *handler.User, oauth2xProvider map[string]oauth2x.Oauth2x) *Use
 		sessConfig:      &sessConfig,
 		srv:             srv,
 		oauth2xProvider: oauth2xProvider,
+
+		homeURL:   viper.GetString("web.home"),
+		activeURL: viper.GetString("web.active_account"),
+		resetURL:  viper.GetString("web.reset_password"),
 	}
 }
 
@@ -168,7 +176,11 @@ func (u *User) SendEmail(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.SendEmail(cx.NewTraceCx(c), req.Email, req.Type, req.URL)
+	url := u.activeURL
+	if req.Type == handler.ResetEmail {
+		url = u.resetURL
+	}
+	err := u.srv.SendEmail(cx.NewTraceCx(c), req.Email, req.Type, url)
 	if err != nil {
 		return err
 	}
@@ -225,7 +237,7 @@ func (u *User) Oauth2SetState(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	u.setStateSession(c, req.State, req.URL)
+	u.setStateSession(c, req.State, u.homeURL)
 
 	return ex.OK(c, nil)
 }
