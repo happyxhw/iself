@@ -76,7 +76,7 @@ func (sr *StravaRepo) GetActivityProgressStats(ctx context.Context, athleteID in
 	activityType, method, field, start string) (float64, error) {
 	result := map[string]interface{}{}
 	tx := sr.db.WithContext(ctx).Model(&model.StravaActivityDetail{}).
-		Select(fmt.Sprintf("%s(%s) value", method, field)).
+		Select(fmt.Sprintf("%s(%s) AS value", method, field)).
 		Where("athlete_id = ? AND type = ?", athleteID, activityType)
 	if start != "" {
 		tx = tx.Where("start_date_local >= ?", start)

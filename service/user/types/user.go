@@ -69,12 +69,10 @@ type ActiveReq struct {
 type SendEmailReq struct {
 	Email string `json:"email" validate:"required,email"`
 	Type  string `json:"type" validate:"oneof=active reset"`
-	URL   string `json:"url" validate:"required,url"`
 }
 
 type SetOauth2StateReq struct {
 	State string `json:"state" validate:"required"`
-	URL   string `json:"url" validate:"required"`
 }
 
 type Oauth2ExchangeReq struct {

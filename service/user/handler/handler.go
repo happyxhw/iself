@@ -52,8 +52,8 @@ const (
 )
 
 const (
-	activeEmail = "active" // 用户激活邮件
-	resetEmail  = "reset"  // 用户重置密码邮件
+	ActiveEmail = "active" // 用户激活邮件
+	ResetEmail  = "reset"  // 用户重置密码邮件
 )
 
 const tokenSep = " "

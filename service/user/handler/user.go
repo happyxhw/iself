@@ -82,7 +82,7 @@ func (u *User) SignUp(ctx context.Context, req *types.SignUpReq) error {
 	if err != nil {
 		return ex.ErrDB.Wrap(err)
 	}
-	err = u.sendEmail(ctx, req.Email, activeEmail, req.ActiveURL)
+	err = u.sendEmail(ctx, req.Email, ActiveEmail, req.ActiveURL)
 	// 忽略邮件发送错误
 	if err != nil {
 		userLogger.Error("send active email", zap.Error(err), log.Ctx(ctx))
@@ -132,7 +132,7 @@ func (u *User) SignInByOauth2(ctx context.Context, source, code string, auth oau
 	email := fmt.Sprintf("%d@%s", oauth2User.SourceID, source)
 	user, err := u.ur.GetByEmail(ctx, email, query.Opt{})
 	if err != nil {
-		return nil, ex.ErrRedis.Wrap(err)
+		return nil, ex.ErrDB.Wrap(err)
 	}
 	if user != nil {
 		return types.NewUser(user), nil
@@ -140,7 +140,7 @@ func (u *User) SignInByOauth2(ctx context.Context, source, code string, auth oau
 	// 	2. 用户可能已经绑定过邮箱(用户绑定邮箱后，email 字段会替换为真实的 email)
 	user, err = u.ur.GetBySource(ctx, source, oauth2User.SourceID, query.Opt{})
 	if err != nil {
-		return nil, ex.ErrRedis.Wrap(err)
+		return nil, ex.ErrDB.Wrap(err)
 	}
 	if user != nil {
 		return types.NewUser(user), nil
@@ -261,7 +261,7 @@ func (u *User) SendEmail(ctx context.Context, email, emailType, redirectURL stri
 
 func (u *User) sendEmail(ctx context.Context, email, emailType, redirectURL string) error {
 	freqKey, activeKey := "active_freq:%s", "active:%s"
-	if emailType == resetEmail {
+	if emailType == ResetEmail {
 		freqKey, activeKey = "reset_freq:%s", "reset:%s"
 	}
 	// 频率限制
@@ -309,11 +309,6 @@ func (u *User) encryptToken(email, token string) (string, error) {
 }
 
 func (u *User) decryptToken(token string) (string, error) {
-	var err error
-	token, err = url.QueryUnescape(token)
-	if err != nil {
-		return "", err
-	}
 	encrypted, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return "", err
@@ -327,7 +322,7 @@ func (u *User) decryptToken(token string) (string, error) {
 
 func getEmailContent(redirectURL, token, emailType string) (subj, body string) {
 	link := fmt.Sprintf("%s?token=%s", redirectURL, token)
-	if emailType == activeEmail {
+	if emailType == ActiveEmail {
 		subj = "To activate your account"
 		body = fmt.Sprintf("Click this link to activate your account: <p><a href=%s>%s</a></p>", link, link)
 	} else {

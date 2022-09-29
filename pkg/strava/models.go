@@ -570,59 +570,59 @@ type TimedZoneRange struct {
 
 // DetailedActivity
 type DetailedActivity struct {
-	ID                   int64                    `json:"id,omitempty" bson:"id"`                                         // The unique identifier of the activity
-	ExternalID           string                   `json:"external_id,omitempty" bson:"external_id"`                       // The identifier provided at upload time
-	UploadID             int64                    `json:"upload_id,omitempty" bson:"upload_id"`                           // The identifier of the upload that resulted in this activity
-	Athlete              *MetaAthlete             `json:"athlete,omitempty" bson:"athlete"`                               // An instance of MetaAthlete.
-	Name                 string                   `json:"name,omitempty" bson:"name"`                                     // The name of the activity
-	Distance             float64                  `json:"distance,omitempty" bson:"distance"`                             // The activity's distance, in meters
-	MovingTime           int                      `json:"moving_time,omitempty" bson:"moving_time"`                       // The activity's moving time, in seconds
-	ElapsedTime          int                      `json:"elapsed_time,omitempty" bson:"elapsed_time"`                     // The activity's elapsed time, in seconds
-	TotalElevationGain   float64                  `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`     // The activity's total elevation gain.
-	ElevHigh             float64                  `json:"elev_high,omitempty" bson:"elev_high"`                           // The activity's highest elevation, in meters
-	ElevLow              float64                  `json:"elev_low,omitempty" bson:"elev_low"`                             // The activity's lowest elevation, in meters
-	Type                 string                   `json:"type,omitempty" bson:"type"`                                     // An instance of ActivityType.
-	StartDate            time.Time                `json:"start_date,omitempty" bson:"start_date"`                         // The time at which the activity was started.
-	StartDateLocal       time.Time                `json:"start_date_local,omitempty" bson:"start_date_local"`             // The time at which the activity was started in the local timezone.
-	Timezone             string                   `json:"timezone,omitempty" bson:"timezone"`                             // The timezone of the activity
-	StartLatlng          *LatLng                  `json:"start_latlng,omitempty" bson:"start_latlng"`                     // An instance of LatLng.
-	EndLatlng            *LatLng                  `json:"end_latlng,omitempty" bson:"end_latlng"`                         // An instance of LatLng.
-	AchievementCount     int                      `json:"achievement_count,omitempty" bson:"achievement_count"`           // The number of achievements gained during this activity
-	KudosCount           int                      `json:"kudos_count,omitempty" bson:"kudos_count"`                       // The number of kudos given for this activity
-	CommentCount         int                      `json:"comment_count,omitempty" bson:"comment_count"`                   // The number of comments for this activity
-	AthleteCount         int                      `json:"athlete_count,omitempty" bson:"athlete_count"`                   // The number of athletes for taking part in a group activity
-	PhotoCount           int                      `json:"photo_count,omitempty" bson:"photo_count"`                       // The number of Instagram photos for this activity
-	TotalPhotoCount      int                      `json:"total_photo_count,omitempty" bson:"total_photo_count"`           // The number of Instagram and Strava photos for this activity
-	Map                  *PolylineMap             `json:"map,omitempty" bson:"map"`                                       // An instance of PolylineMap.
-	Trainer              bool                     `json:"trainer,omitempty" bson:"trainer"`                               // Whether this activity was recorded on a training machine
-	Commute              bool                     `json:"commute,omitempty" bson:"commute"`                               // Whether this activity is a commute
-	Manual               bool                     `json:"manual,omitempty" bson:"manual"`                                 // Whether this activity was created manually
-	Private              bool                     `json:"private,omitempty" bson:"private"`                               // Whether this activity is private
-	Flagged              bool                     `json:"flagged,omitempty" bson:"flagged"`                               // Whether this activity is flagged
-	WorkoutType          int                      `json:"workout_type,omitempty" bson:"workout_type"`                     // The activity's workout type
-	UploadIdStr          string                   `json:"upload_id_str,omitempty" bson:"upload_id_str"`                   // The unique identifier of the upload in string format
-	AverageSpeed         float64                  `json:"average_speed,omitempty" bson:"average_speed"`                   // The activity's average speed, in meters per second
-	MaxSpeed             float64                  `json:"max_speed,omitempty" bson:"max_speed"`                           // The activity's max speed, in meters per second
-	HasKudoed            bool                     `json:"has_kudoed,omitempty" bson:"has_kudoed"`                         // Whether the logged-in athlete has kudoed this activity
-	GearId               string                   `json:"gear_id,omitempty" bson:"gear_id"`                               // The id of the gear for the activity
-	Kilojoules           float64                  `json:"kilojoules,omitempty" bson:"kilojoules"`                         // The total work done in kilojoules during this activity. Rides only
-	AverageWatts         float64                  `json:"average_watts,omitempty" bson:"average_watts"`                   // Average power output in watts during this activity. Rides only
-	DeviceWatts          bool                     `json:"device_watts,omitempty" bson:"device_watts"`                     // Whether the watts are from a power meter, false if estimated
-	MaxWatts             int                      `json:"max_watts,omitempty" bson:"max_watts"`                           // Rides with power meter data only
-	WeightedAverageWatts int                      `json:"weighted_average_watts,omitempty" bson:"weighted_average_watts"` // Similar to Normalized Power. Rides with power meter data only
-	Description          string                   `json:"description,omitempty" bson:"description"`                       // The description of the activity
-	Photos               *PhotosSummary           `json:"photos,omitempty" bson:"photos"`                                 // An instance of PhotosSummary.
-	Gear                 *SummaryGear             `json:"gear,omitempty" bson:"gear"`                                     // An instance of SummaryGear.
-	Calories             float64                  `json:"calories,omitempty" bson:"calories"`                             // The number of kilocalories consumed during this activity
-	SegmentEfforts       []*DetailedSegmentEffort `json:"segment_efforts,omitempty" bson:"segment_efforts"`               // A collection of DetailedSegmentEffort objects.
-	DeviceName           string                   `json:"device_name,omitempty" bson:"device_name"`                       // The name of the device used to record the activity
-	EmbedToken           string                   `json:"embed_token,omitempty" bson:"embed_token"`                       // The token used to embed a Strava activity
-	SplitsMetric         []*Split                 `json:"splits_metric,omitempty" bson:"splits_metric"`                   // The splits of this activity in metric units (for runs)
-	SplitsStandard       []*Split                 `json:"splits_standard,omitempty" bson:"splits_standard"`               // The splits of this activity in imperial units (for runs)
-	Laps                 []*Lap                   `json:"laps,omitempty" bson:"laps"`                                     // A collection of Lap objects.
-	BestEfforts          []*DetailedSegmentEffort `json:"best_efforts,omitempty" bson:"best_efforts"`
-	AverageHeartrate     float64                  `json:"average_heartrate,omitempty" bson:"average_heartrate"` // The heart heart rate of the athlete during this effort
-	MaxHeartrate         float64                  `json:"max_heartrate,omitempty" bson:"max_heartrate"`         // The maximum heart rate of the athlete during this effort
+	ID                   int64                    `json:"id" bson:"id"`                                         // The unique identifier of the activity
+	ExternalID           string                   `json:"external_id" bson:"external_id"`                       // The identifier provided at upload time
+	UploadID             int64                    `json:"upload_id" bson:"upload_id"`                           // The identifier of the upload that resulted in this activity
+	Athlete              *MetaAthlete             `json:"athlete" bson:"athlete"`                               // An instance of MetaAthlete.
+	Name                 string                   `json:"name" bson:"name"`                                     // The name of the activity
+	Distance             float64                  `json:"distance" bson:"distance"`                             // The activity's distance, in meters
+	MovingTime           int                      `json:"moving_time" bson:"moving_time"`                       // The activity's moving time, in seconds
+	ElapsedTime          int                      `json:"elapsed_time" bson:"elapsed_time"`                     // The activity's elapsed time, in seconds
+	TotalElevationGain   float64                  `json:"total_elevation_gain" bson:"total_elevation_gain"`     // The activity's total elevation gain.
+	ElevHigh             float64                  `json:"elev_high" bson:"elev_high"`                           // The activity's highest elevation, in meters
+	ElevLow              float64                  `json:"elev_low" bson:"elev_low"`                             // The activity's lowest elevation, in meters
+	Type                 string                   `json:"type" bson:"type"`                                     // An instance of ActivityType.
+	StartDate            time.Time                `json:"start_date" bson:"start_date"`                         // The time at which the activity was started.
+	StartDateLocal       time.Time                `json:"start_date_local" bson:"start_date_local"`             // The time at which the activity was started in the local timezone.
+	Timezone             string                   `json:"timezone" bson:"timezone"`                             // The timezone of the activity
+	StartLatlng          *LatLng                  `json:"start_latlng" bson:"start_latlng"`                     // An instance of LatLng.
+	EndLatlng            *LatLng                  `json:"end_latlng" bson:"end_latlng"`                         // An instance of LatLng.
+	AchievementCount     int                      `json:"achievement_count" bson:"achievement_count"`           // The number of achievements gained during this activity
+	KudosCount           int                      `json:"kudos_count" bson:"kudos_count"`                       // The number of kudos given for this activity
+	CommentCount         int                      `json:"comment_count" bson:"comment_count"`                   // The number of comments for this activity
+	AthleteCount         int                      `json:"athlete_count" bson:"athlete_count"`                   // The number of athletes for taking part in a group activity
+	PhotoCount           int                      `json:"photo_count" bson:"photo_count"`                       // The number of Instagram photos for this activity
+	TotalPhotoCount      int                      `json:"total_photo_count" bson:"total_photo_count"`           // The number of Instagram and Strava photos for this activity
+	Map                  *PolylineMap             `json:"map" bson:"map"`                                       // An instance of PolylineMap.
+	Trainer              bool                     `json:"trainer" bson:"trainer"`                               // Whether this activity was recorded on a training machine
+	Commute              bool                     `json:"commute" bson:"commute"`                               // Whether this activity is a commute
+	Manual               bool                     `json:"manual" bson:"manual"`                                 // Whether this activity was created manually
+	Private              bool                     `json:"private" bson:"private"`                               // Whether this activity is private
+	Flagged              bool                     `json:"flagged" bson:"flagged"`                               // Whether this activity is flagged
+	WorkoutType          int                      `json:"workout_type" bson:"workout_type"`                     // The activity's workout type
+	UploadIdStr          string                   `json:"upload_id_str" bson:"upload_id_str"`                   // The unique identifier of the upload in string format
+	AverageSpeed         float64                  `json:"average_speed" bson:"average_speed"`                   // The activity's average speed, in meters per second
+	MaxSpeed             float64                  `json:"max_speed" bson:"max_speed"`                           // The activity's max speed, in meters per second
+	HasKudoed            bool                     `json:"has_kudoed" bson:"has_kudoed"`                         // Whether the logged-in athlete has kudoed this activity
+	GearId               string                   `json:"gear_id" bson:"gear_id"`                               // The id of the gear for the activity
+	Kilojoules           float64                  `json:"kilojoules" bson:"kilojoules"`                         // The total work done in kilojoules during this activity. Rides only
+	AverageWatts         float64                  `json:"average_watts" bson:"average_watts"`                   // Average power output in watts during this activity. Rides only
+	DeviceWatts          bool                     `json:"device_watts" bson:"device_watts"`                     // Whether the watts are from a power meter, false if estimated
+	MaxWatts             int                      `json:"max_watts" bson:"max_watts"`                           // Rides with power meter data only
+	WeightedAverageWatts int                      `json:"weighted_average_watts" bson:"weighted_average_watts"` // Similar to Normalized Power. Rides with power meter data only
+	Description          string                   `json:"description" bson:"description"`                       // The description of the activity
+	Photos               *PhotosSummary           `json:"photos" bson:"photos"`                                 // An instance of PhotosSummary.
+	Gear                 *SummaryGear             `json:"gear" bson:"gear"`                                     // An instance of SummaryGear.
+	Calories             float64                  `json:"calories" bson:"calories"`                             // The number of kilocalories consumed during this activity
+	SegmentEfforts       []*DetailedSegmentEffort `json:"segment_efforts" bson:"segment_efforts"`               // A collection of DetailedSegmentEffort objects.
+	DeviceName           string                   `json:"device_name" bson:"device_name"`                       // The name of the device used to record the activity
+	EmbedToken           string                   `json:"embed_token" bson:"embed_token"`                       // The token used to embed a Strava activity
+	SplitsMetric         []*Split                 `json:"splits_metric" bson:"splits_metric"`                   // The splits of this activity in metric units (for runs)
+	SplitsStandard       []*Split                 `json:"splits_standard" bson:"splits_standard"`               // The splits of this activity in imperial units (for runs)
+	Laps                 []*Lap                   `json:"laps" bson:"laps"`                                     // A collection of Lap objects.
+	BestEfforts          []*DetailedSegmentEffort `json:"best_efforts" bson:"best_efforts"`
+	AverageHeartrate     float64                  `json:"average_heartrate" bson:"average_heartrate"` // The heart heart rate of the athlete during this effort
+	MaxHeartrate         float64                  `json:"max_heartrate" bson:"max_heartrate"`         // The maximum heart rate of the athlete during this effort
 }
 
 // DetailedAthlete
