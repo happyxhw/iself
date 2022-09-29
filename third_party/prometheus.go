@@ -5,17 +5,21 @@ Example:
 ```
 package main
 import (
-    "github.com/labstack/echo/v4"
-    "github.com/labstack/echo-contrib/prometheus"
-)
-func main() {
-    e := echo.New()
-    // Enable metrics middleware
-    p := prometheus.NewPrometheus("echo", nil)
-    p.Use(e)
 
-    e.Logger.Fatal(e.Start(":1323"))
-}
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo-contrib/prometheus"
+
+)
+
+	func main() {
+	    e := echo.New()
+	    // Enable metrics middleware
+	    p := prometheus.NewPrometheus("echo", nil)
+	    p.Use(e)
+
+	    e.Logger.Fatal(e.Start(":1323"))
+	}
+
 ```
 */
 package third_party
@@ -35,13 +39,14 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/expfmt"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/em"
+	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
 )
 
 var defaultMetricPath = "/metrics"
 var defaultSubsystem = "echo"
 
 // Standard default metrics
+//
 //	counter, counter_vec, gauge, gauge_vec,
 //	histogram, histogram_vec, summary, summary_vec
 var reqCnt = &Metric{
@@ -85,16 +90,16 @@ the cardinality of the request counter's "url" label, which might be required in
 For instance, if for a "/customer/:name" route you don't want to generate a time series for every
 possible customer name, you could use this function:
 
-func(c echo.Context) string {
-	url := c.Request.URL.Path
-	for _, p := range c.Params {
-		if p.Key == "name" {
-			url = strings.Replace(url, p.Value, ":name", 1)
-			break
+	func(c echo.Context) string {
+		url := c.Request.URL.Path
+		for _, p := range c.Params {
+			if p.Key == "name" {
+				url = strings.Replace(url, p.Value, ":name", 1)
+				break
+			}
 		}
+		return url
 	}
-	return url
-}
 
 which would map "/customer/alice" and "/customer/bob" to their template "/customer/:name".
 It can also be applied for the "Host" label
@@ -383,7 +388,7 @@ func (p *Prometheus) HandlerFunc(next echo.HandlerFunc) echo.HandlerFunc {
 
 		status := c.Response().Status
 		if err != nil {
-			var emError *em.Error
+			var emError *ex.Error
 			if !errors.As(err, &emError) {
 				return err
 			}

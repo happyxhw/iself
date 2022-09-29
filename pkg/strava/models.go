@@ -24,10 +24,10 @@ type ActivityStats struct {
 // A roll-up of metrics pertaining to a set of activities. Values are in seconds and meters.
 type ActivityTotal struct {
 	Count            int     `json:"count,omitempty" bson:"count"`                         // The number of activities considered in this total.
-	Distance         float32 `json:"distance,omitempty" bson:"distance"`                   // The total distance covered by the considered activities.
+	Distance         float64 `json:"distance,omitempty" bson:"distance"`                   // The total distance covered by the considered activities.
 	MovingTime       int     `json:"moving_time,omitempty" bson:"moving_time"`             // The total moving time of the considered activities.
 	ElapsedTime      int     `json:"elapsed_time,omitempty" bson:"elapsed_time"`           // The total elapsed time of the considered activities.
-	ElevationGain    float32 `json:"elevation_gain,omitempty" bson:"elevation_gain"`       // The total elevation gain of the considered activities.
+	ElevationGain    float64 `json:"elevation_gain,omitempty" bson:"elevation_gain"`       // The total elevation gain of the considered activities.
 	AchievementCount int     `json:"achievement_count,omitempty" bson:"achievement_count"` // The total number of achievements of the considered activities.
 }
 
@@ -80,11 +80,11 @@ type ExplorerSegment struct {
 	Name              string  `json:"name,omitempty" bson:"name"`                               // The name of this segment
 	ClimbCategory     int     `json:"climb_category,omitempty" bson:"climb_category"`           // The category of the climb [0, 5]. Higher is harder ie. 5 is Hors catégorie, 0 is uncategorized in climb_category. If climb_category = 5, climb_category_desc = HC. If climb_category = 2, climb_category_desc = 3.
 	ClimbCategoryDesc string  `json:"climb_category_desc,omitempty" bson:"climb_category_desc"` // The description for the category of the climb May take one of the following values: NC, 4, 3, 2, 1, HC
-	AvgGrade          float32 `json:"avg_grade,omitempty" bson:"avg_grade"`                     // The segment's average grade, in percents
+	AvgGrade          float64 `json:"avg_grade,omitempty" bson:"avg_grade"`                     // The segment's average grade, in percents
 	StartLatlng       *LatLng `json:"start_latlng,omitempty" bson:"start_latlng"`               // An instance of LatLng.
 	EndLatlng         *LatLng `json:"end_latlng,omitempty" bson:"end_latlng"`                   // An instance of LatLng.
-	ElevDifference    float32 `json:"elev_difference,omitempty" bson:"elev_difference"`         // The segments's elevation difference, in meters
-	Distance          float32 `json:"distance,omitempty" bson:"distance"`                       // The segment's distance, in meters
+	ElevDifference    float64 `json:"elev_difference,omitempty" bson:"elev_difference"`         // The segments's elevation difference, in meters
+	Distance          float64 `json:"distance,omitempty" bson:"distance"`                       // The segment's distance, in meters
 	Points            string  `json:"points,omitempty" bson:"points"`                           // The polyline of the segment
 }
 
@@ -106,26 +106,26 @@ type Lap struct {
 	Id                 int64         `json:"id,omitempty" bson:"id"`                                     // The unique identifier of this lap
 	Activity           *MetaActivity `json:"activity,omitempty" bson:"activity"`                         // An instance of MetaActivity.
 	Athlete            *MetaAthlete  `json:"athlete,omitempty" bson:"athlete"`                           // An instance of MetaAthlete.
-	AverageCadence     float32       `json:"average_cadence,omitempty" bson:"average_cadence"`           // The lap's average cadence
-	AverageSpeed       float32       `json:"average_speed,omitempty" bson:"average_speed"`               // The lap's average speed
-	Distance           float32       `json:"distance,omitempty" bson:"distance"`                         // The lap's distance, in meters
+	AverageCadence     float64       `json:"average_cadence,omitempty" bson:"average_cadence"`           // The lap's average cadence
+	AverageSpeed       float64       `json:"average_speed,omitempty" bson:"average_speed"`               // The lap's average speed
+	Distance           float64       `json:"distance,omitempty" bson:"distance"`                         // The lap's distance, in meters
 	ElapsedTime        int           `json:"elapsed_time,omitempty" bson:"elapsed_time"`                 // The lap's elapsed time, in seconds
 	StartIndex         int           `json:"start_index,omitempty" bson:"start_index"`                   // The start index of this effort in its activity's stream
 	EndIndex           int           `json:"end_index,omitempty" bson:"end_index"`                       // The end index of this effort in its activity's stream
 	LapIndex           int           `json:"lap_index,omitempty" bson:"lap_index"`                       // The index of this lap in the activity it belongs to
-	MaxSpeed           float32       `json:"max_speed,omitempty" bson:"max_speed"`                       // The maximum speed of this lat, in meters per second
+	MaxSpeed           float64       `json:"max_speed,omitempty" bson:"max_speed"`                       // The maximum speed of this lat, in meters per second
 	MovingTime         int           `json:"moving_time,omitempty" bson:"moving_time"`                   // The lap's moving time, in seconds
 	Name               string        `json:"name,omitempty" bson:"name"`                                 // The name of the lap
 	PaceZone           int           `json:"pace_zone,omitempty" bson:"pace_zone"`                       // The athlete's pace zone during this lap
 	Split              int           `json:"split,omitempty" bson:"split"`                               // An instance of integer.
 	StartDate          time.Time     `json:"start_date,omitempty" bson:"start_date"`                     // The time at which the lap was started.
 	StartDateLocal     time.Time     `json:"start_date_local,omitempty" bson:"start_date_local"`         // The time at which the lap was started in the local timezone.
-	TotalElevationGain float32       `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"` // The elevation gain of this lap, in meters
+	TotalElevationGain float64       `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"` // The elevation gain of this lap, in meters
 }
 
 // LatLng
 // A collection of float objects. A pair of latitude/longitude coordinates, represented as an array of 2 floating point numbers.
-type LatLng []float32
+type LatLng []float64
 
 // MetaActivity
 type MetaActivity struct {
@@ -134,7 +134,7 @@ type MetaActivity struct {
 
 // MetaAthlete
 type MetaAthlete struct {
-	Id int64 `json:"id,omitempty" bson:"id"` // The unique identifier of the athlete
+	ID int64 `json:"id,omitempty" bson:"id"` // The unique identifier of the athlete
 }
 
 // MetaClub
@@ -174,8 +174,8 @@ type PowerZoneRanges struct {
 type Route struct {
 	Athlete             *SummaryAthlete `json:"athlete,omitempty" bson:"athlete"`                             // An instance of SummaryAthlete.
 	Description         string          `json:"description,omitempty" bson:"description"`                     // The description of the route
-	Distance            float32         `json:"distance,omitempty" bson:"distance"`                           // The route's distance, in meters
-	ElevationGain       float32         `json:"elevation_gain,omitempty" bson:"elevation_gain"`               // The route's elevation gain.
+	Distance            float64         `json:"distance,omitempty" bson:"distance"`                           // The route's distance, in meters
+	ElevationGain       float64         `json:"elevation_gain,omitempty" bson:"elevation_gain"`               // The route's elevation gain.
 	Id                  int64           `json:"id,omitempty" bson:"id"`                                       // The unique identifier of this route
 	IdStr               string          `json:"id_str,omitempty" bson:"id_str"`                               // The unique identifier of the route in string format
 	Map                 *PolylineMap    `json:"map,omitempty" bson:"map"`                                     // An instance of PolylineMap.
@@ -196,7 +196,7 @@ type RunningRace struct {
 	Id                    int64     `json:"id,omitempty" bson:"id"`                                         // The unique identifier of this race.
 	Name                  string    `json:"name,omitempty" bson:"name"`                                     // The name of this race.
 	RunningRaceType       int       `json:"running_race_type,omitempty" bson:"running_race_type"`           // The type of this race.
-	Distance              float32   `json:"distance,omitempty" bson:"distance"`                             // The race's distance, in meters.
+	Distance              float64   `json:"distance,omitempty" bson:"distance"`                             // The race's distance, in meters.
 	StartDateLocal        time.Time `json:"start_date_local,omitempty" bson:"start_date_local"`             // The time at which the race begins started in the local timezone.
 	City                  string    `json:"city,omitempty" bson:"city"`                                     // The name of the city in which the race is taking place.
 	State                 string    `json:"state,omitempty" bson:"state"`                                   // The name of the state or geographical region in which the race is taking place.
@@ -209,10 +209,10 @@ type RunningRace struct {
 
 // Split
 type Split struct {
-	AverageSpeed        float32 `json:"average_speed,omitempty" bson:"average_speed"`               // The average speed of this split, in meters per second
-	Distance            float32 `json:"distance,omitempty" bson:"distance"`                         // The distance of this split, in meters
+	AverageSpeed        float64 `json:"average_speed,omitempty" bson:"average_speed"`               // The average speed of this split, in meters per second
+	Distance            float64 `json:"distance,omitempty" bson:"distance"`                         // The distance of this split, in meters
 	ElapsedTime         int     `json:"elapsed_time,omitempty" bson:"elapsed_time"`                 // The elapsed time of this split, in seconds
-	ElevationDifference float32 `json:"elevation_difference,omitempty" bson:"elevation_difference"` // The elevation difference of this split, in meters
+	ElevationDifference float64 `json:"elevation_difference,omitempty" bson:"elevation_difference"` // The elevation difference of this split, in meters
 	PaceZone            int     `json:"pace_zone,omitempty" bson:"pace_zone"`                       // The pacing zone of this split
 	MovingTime          int     `json:"moving_time,omitempty" bson:"moving_time"`                   // The moving time of this split, in seconds
 	Split               int     `json:"split,omitempty" bson:"split"`                               // N/A
@@ -239,7 +239,7 @@ type SummaryGear struct {
 	ResourceState int     `json:"resource_state,omitempty" bson:"resource_state"` // Resource state, indicates level of detail. Possible values: 2 -> "summary", 3 -> "detail"
 	Primary       bool    `json:"primary,omitempty" bson:"primary"`               // Whether this gear's is the owner's default one.
 	Name          string  `json:"name,omitempty" bson:"name"`                     // The gear's name.
-	Distance      float32 `json:"distance,omitempty" bson:"distance"`             // The distance logged with this gear.
+	Distance      float64 `json:"distance,omitempty" bson:"distance"`             // The distance logged with this gear.
 }
 
 // SummaryPRSegmentEffort
@@ -255,11 +255,11 @@ type SummarySegment struct {
 	Id                  int64                   `json:"id,omitempty" bson:"id"`                                       // The unique identifier of this segment
 	Name                string                  `json:"name,omitempty" bson:"name"`                                   // The name of this segment
 	ActivityType        string                  `json:"activity_type,omitempty" bson:"activity_type"`                 // May take one of the following values: Ride, Run
-	Distance            float32                 `json:"distance,omitempty" bson:"distance"`                           // The segment's distance, in meters
-	AverageGrade        float32                 `json:"average_grade,omitempty" bson:"average_grade"`                 // The segment's average grade, in percents
-	MaximumGrade        float32                 `json:"maximum_grade,omitempty" bson:"maximum_grade"`                 // The segments's maximum grade, in percents
-	ElevationHigh       float32                 `json:"elevation_high,omitempty" bson:"elevation_high"`               // The segments's highest elevation, in meters
-	ElevationLow        float32                 `json:"elevation_low,omitempty" bson:"elevation_low"`                 // The segments's lowest elevation, in meters
+	Distance            float64                 `json:"distance,omitempty" bson:"distance"`                           // The segment's distance, in meters
+	AverageGrade        float64                 `json:"average_grade,omitempty" bson:"average_grade"`                 // The segment's average grade, in percents
+	MaximumGrade        float64                 `json:"maximum_grade,omitempty" bson:"maximum_grade"`                 // The segments's maximum grade, in percents
+	ElevationHigh       float64                 `json:"elevation_high,omitempty" bson:"elevation_high"`               // The segments's highest elevation, in meters
+	ElevationLow        float64                 `json:"elevation_low,omitempty" bson:"elevation_low"`                 // The segments's lowest elevation, in meters
 	StartLatlng         *LatLng                 `json:"start_latlng,omitempty" bson:"start_latlng"`                   // An instance of LatLng.
 	EndLatlng           *LatLng                 `json:"end_latlng,omitempty" bson:"end_latlng"`                       // An instance of LatLng.
 	ClimbCategory       int                     `json:"climb_category,omitempty" bson:"climb_category"`               // The category of the climb [0, 5]. Higher is harder ie. 5 is Hors catégorie, 0 is uncategorized in climb_category.
@@ -278,7 +278,7 @@ type SummarySegmentEffort struct {
 	ElapsedTime    int       `json:"elapsed_time,omitempty" bson:"elapsed_time"`         // The effort's elapsed time
 	StartDate      time.Time `json:"start_date,omitempty" bson:"start_date"`             // The time at which the effort was started.
 	StartDateLocal time.Time `json:"start_date_local,omitempty" bson:"start_date_local"` // The time at which the effort was started in the local timezone.
-	Distance       float32   `json:"distance,omitempty" bson:"distance"`                 // The effort's distance in meters
+	Distance       float64   `json:"distance,omitempty" bson:"distance"`                 // The effort's distance in meters
 	IsKom          bool      `json:"is_kom,omitempty" bson:"is_kom"`                     // Whether this effort is the current best on the leaderboard
 }
 
@@ -327,7 +327,7 @@ type AltitudeStream struct {
 	OriginalSize int       `json:"original_size,omitempty" bson:"original_size"` // The number of data points in this stream
 	Resolution   string    `json:"resolution,omitempty" bson:"resolution"`       // The level of detail (sampling) in which this stream was returned May take one of the following values: low, medium, high
 	SeriesType   string    `json:"series_type,omitempty" bson:"series_type"`     // The base series used in the case the stream was downsampled May take one of the following values: distance, time
-	Data         []float32 `json:"data,omitempty" bson:"data"`                   // The sequence of altitude values for this stream, in meters
+	Data         []float64 `json:"data,omitempty" bson:"data"`                   // The sequence of altitude values for this stream, in meters
 }
 
 // CadenceStream
@@ -344,7 +344,7 @@ type DetailedGear struct {
 	ResourceState int     `json:"resource_state,omitempty" bson:"resource_state"` // Resource state, indicates level of detail. Possible values: 2 -> "summary", 3 -> "detail"
 	Primary       bool    `json:"primary,omitempty" bson:"primary"`               // Whether this gear's is the owner's default one.
 	Name          string  `json:"name,omitempty" bson:"name"`                     // The gear's name.
-	Distance      float32 `json:"distance,omitempty" bson:"distance"`             // The distance logged with this gear.
+	Distance      float64 `json:"distance,omitempty" bson:"distance"`             // The distance logged with this gear.
 	BrandName     string  `json:"brand_name,omitempty" bson:"brand_name"`         // The gear's brand name.
 	ModelName     string  `json:"model_name,omitempty" bson:"model_name"`         // The gear's model name.
 	FrameType     int     `json:"frame_type,omitempty" bson:"frame_type"`         // The gear's frame type (bike only).
@@ -356,11 +356,11 @@ type DetailedSegment struct {
 	Id                  int64                   `json:"id,omitempty" bson:"id"`                                       // The unique identifier of this segment
 	Name                string                  `json:"name,omitempty" bson:"name"`                                   // The name of this segment
 	ActivityType        string                  `json:"activity_type,omitempty" bson:"activity_type"`                 // May take one of the following values: Ride, Run
-	Distance            float32                 `json:"distance,omitempty" bson:"distance"`                           // The segment's distance, in meters
-	AverageGrade        float32                 `json:"average_grade,omitempty" bson:"average_grade"`                 // The segment's average grade, in percents
-	MaximumGrade        float32                 `json:"maximum_grade,omitempty" bson:"maximum_grade"`                 // The segments's maximum grade, in percents
-	ElevationHigh       float32                 `json:"elevation_high,omitempty" bson:"elevation_high"`               // The segments's highest elevation, in meters
-	ElevationLow        float32                 `json:"elevation_low,omitempty" bson:"elevation_low"`                 // The segments's lowest elevation, in meters
+	Distance            float64                 `json:"distance,omitempty" bson:"distance"`                           // The segment's distance, in meters
+	AverageGrade        float64                 `json:"average_grade,omitempty" bson:"average_grade"`                 // The segment's average grade, in percents
+	MaximumGrade        float64                 `json:"maximum_grade,omitempty" bson:"maximum_grade"`                 // The segments's maximum grade, in percents
+	ElevationHigh       float64                 `json:"elevation_high,omitempty" bson:"elevation_high"`               // The segments's highest elevation, in meters
+	ElevationLow        float64                 `json:"elevation_low,omitempty" bson:"elevation_low"`                 // The segments's lowest elevation, in meters
 	StartLatlng         *LatLng                 `json:"start_latlng,omitempty" bson:"start_latlng"`                   // An instance of LatLng.
 	EndLatlng           *LatLng                 `json:"end_latlng,omitempty" bson:"end_latlng"`                       // An instance of LatLng.
 	ClimbCategory       int                     `json:"climb_category,omitempty" bson:"climb_category"`               // The category of the climb [0, 5]. Higher is harder ie. 5 is Hors catégorie, 0 is uncategorized in climb_category.
@@ -372,7 +372,7 @@ type DetailedSegment struct {
 	AthleteSegmentStats *SummaryPRSegmentEffort `json:"athlete_segment_stats,omitempty" bson:"athlete_segment_stats"` // An instance of SummaryPRSegmentEffort.
 	CreatedAt           time.Time               `json:"created_at,omitempty" bson:"created_at"`                       // The time at which the segment was created.
 	UpdatedAt           time.Time               `json:"updated_at,omitempty" bson:"updated_at"`                       // The time at which the segment was last updated.
-	TotalElevationGain  float32                 `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`   // The segment's total elevation gain.
+	TotalElevationGain  float64                 `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`   // The segment's total elevation gain.
 	Map                 *PolylineMap            `json:"map,omitempty" bson:"map"`                                     // An instance of PolylineMap.
 	EffortCount         int                     `json:"effort_count,omitempty" bson:"effort_count"`                   // The total number of efforts for this segment
 	AthleteCount        int                     `json:"athlete_count,omitempty" bson:"athlete_count"`                 // The number of unique athletes who have an effort for this segment
@@ -387,7 +387,7 @@ type DetailedSegmentEffort struct {
 	ElapsedTime      int             `json:"elapsed_time,omitempty" bson:"elapsed_time"`           // The effort's elapsed time
 	StartDate        time.Time       `json:"start_date,omitempty" bson:"start_date"`               // The time at which the effort was started.
 	StartDateLocal   time.Time       `json:"start_date_local,omitempty" bson:"start_date_local"`   // The time at which the effort was started in the local timezone.
-	Distance         float32         `json:"distance,omitempty" bson:"distance"`                   // The effort's distance in meters
+	Distance         float64         `json:"distance,omitempty" bson:"distance"`                   // The effort's distance in meters
 	IsKom            bool            `json:"is_kom,omitempty" bson:"is_kom"`                       // Whether this effort is the current best on the leaderboard
 	Name             string          `json:"name,omitempty" bson:"name"`                           // The name of the segment on which this effort was performed
 	Activity         *MetaActivity   `json:"activity,omitempty" bson:"activity"`                   // An instance of MetaActivity.
@@ -395,11 +395,11 @@ type DetailedSegmentEffort struct {
 	MovingTime       int             `json:"moving_time,omitempty" bson:"moving_time"`             // The effort's moving time
 	StartIndex       int             `json:"start_index,omitempty" bson:"start_index"`             // The start index of this effort in its activity's stream
 	EndIndex         int             `json:"end_index,omitempty" bson:"end_index"`                 // The end index of this effort in its activity's stream
-	AverageCadence   float32         `json:"average_cadence,omitempty" bson:"average_cadence"`     // The effort's average cadence
-	AverageWatts     float32         `json:"average_watts,omitempty" bson:"average_watts"`         // The average wattage of this effort
+	AverageCadence   float64         `json:"average_cadence,omitempty" bson:"average_cadence"`     // The effort's average cadence
+	AverageWatts     float64         `json:"average_watts,omitempty" bson:"average_watts"`         // The average wattage of this effort
 	DeviceWatts      bool            `json:"device_watts,omitempty" bson:"device_watts"`           // For riding efforts, whether the wattage was reported by a dedicated recording device
-	AverageHeartrate float32         `json:"average_heartrate,omitempty" bson:"average_heartrate"` // The heart heart rate of the athlete during this effort
-	MaxHeartrate     float32         `json:"max_heartrate,omitempty" bson:"max_heartrate"`         // The maximum heart rate of the athlete during this effort
+	AverageHeartrate float64         `json:"average_heartrate,omitempty" bson:"average_heartrate"` // The heart heart rate of the athlete during this effort
+	MaxHeartrate     float64         `json:"max_heartrate,omitempty" bson:"max_heartrate"`         // The maximum heart rate of the athlete during this effort
 	Segment          *SummarySegment `json:"segment,omitempty" bson:"segment"`                     // An instance of SummarySegment.
 	KomRank          int             `json:"kom_rank,omitempty" bson:"kom_rank"`                   // The rank of the effort on the global leaderboard if it belongs in the top 10 at the time of upload
 	PrRank           int             `json:"pr_rank,omitempty" bson:"pr_rank"`                     // The rank of the effort on the athlete's leaderboard if it belongs in the top 3 at the time of upload
@@ -411,7 +411,7 @@ type DistanceStream struct {
 	OriginalSize int       `json:"original_size,omitempty" bson:"original_size"` // The number of data points in this stream
 	Resolution   string    `json:"resolution,omitempty" bson:"resolution"`       // The level of detail (sampling) in which this stream was returned May take one of the following values: low, medium, high
 	SeriesType   string    `json:"series_type,omitempty" bson:"series_type"`     // The base series used in the case the stream was downsampled May take one of the following values: distance, time
-	Data         []float32 `json:"data,omitempty" bson:"data"`                   // The sequence of distance values for this stream, in meters
+	Data         []float64 `json:"data,omitempty" bson:"data"`                   // The sequence of distance values for this stream, in meters
 }
 
 // HeartrateStream
@@ -451,7 +451,7 @@ type SmoothGradeStream struct {
 	OriginalSize int       `json:"original_size,omitempty" bson:"original_size"` // The number of data points in this stream
 	Resolution   string    `json:"resolution,omitempty" bson:"resolution"`       // The level of detail (sampling) in which this stream was returned May take one of the following values: low, medium, high
 	SeriesType   string    `json:"series_type,omitempty" bson:"series_type"`     // The base series used in the case the stream was downsampled May take one of the following values: distance, time
-	Data         []float32 `json:"data,omitempty" bson:"data"`                   // The sequence of grade values for this stream, as percents of a grade
+	Data         []float64 `json:"data,omitempty" bson:"data"`                   // The sequence of grade values for this stream, as percents of a grade
 }
 
 // SmoothVelocityStream
@@ -459,7 +459,7 @@ type SmoothVelocityStream struct {
 	OriginalSize int       `json:"original_size,omitempty" bson:"original_size"` // The number of data points in this stream
 	Resolution   string    `json:"resolution,omitempty" bson:"resolution"`       // The level of detail (sampling) in which this stream was returned May take one of the following values: low, medium, high
 	SeriesType   string    `json:"series_type,omitempty" bson:"series_type"`     // The base series used in the case the stream was downsampled May take one of the following values: distance, time
-	Data         []float32 `json:"data,omitempty" bson:"data"`                   // The sequence of velocity values for this stream, in meters per second
+	Data         []float64 `json:"data,omitempty" bson:"data"`                   // The sequence of velocity values for this stream, in meters per second
 }
 
 // SummaryActivity
@@ -469,12 +469,12 @@ type SummaryActivity struct {
 	UploadId             int64         `json:"upload_id,omitempty" bson:"upload_id"`                           // The identifier of the upload that resulted in this activity
 	Athlete              *MetaAthlete  `json:"athlete,omitempty" bson:"athlete"`                               // An instance of MetaAthlete.
 	Name                 string        `json:"name,omitempty" bson:"name"`                                     // The name of the activity
-	Distance             float32       `json:"distance,omitempty" bson:"distance"`                             // The activity's distance, in meters
+	Distance             float64       `json:"distance,omitempty" bson:"distance"`                             // The activity's distance, in meters
 	MovingTime           int           `json:"moving_time,omitempty" bson:"moving_time"`                       // The activity's moving time, in seconds
 	ElapsedTime          int           `json:"elapsed_time,omitempty" bson:"elapsed_time"`                     // The activity's elapsed time, in seconds
-	TotalElevationGain   float32       `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`     // The activity's total elevation gain.
-	ElevHigh             float32       `json:"elev_high,omitempty" bson:"elev_high"`                           // The activity's highest elevation, in meters
-	ElevLow              float32       `json:"elev_low,omitempty" bson:"elev_low"`                             // The activity's lowest elevation, in meters
+	TotalElevationGain   float64       `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`     // The activity's total elevation gain.
+	ElevHigh             float64       `json:"elev_high,omitempty" bson:"elev_high"`                           // The activity's highest elevation, in meters
+	ElevLow              float64       `json:"elev_low,omitempty" bson:"elev_low"`                             // The activity's lowest elevation, in meters
 	Type                 *ActivityType `json:"type,omitempty" bson:"type"`                                     // An instance of ActivityType.
 	StartDate            time.Time     `json:"start_date,omitempty" bson:"start_date"`                         // The time at which the activity was started.
 	StartDateLocal       time.Time     `json:"start_date_local,omitempty" bson:"start_date_local"`             // The time at which the activity was started in the local timezone.
@@ -495,12 +495,12 @@ type SummaryActivity struct {
 	Flagged              bool          `json:"flagged,omitempty" bson:"flagged"`                               // Whether this activity is flagged
 	WorkoutType          int           `json:"workout_type,omitempty" bson:"workout_type"`                     // The activity's workout type
 	UploadIdStr          string        `json:"upload_id_str,omitempty" bson:"upload_id_str"`                   // The unique identifier of the upload in string format
-	AverageSpeed         float32       `json:"average_speed,omitempty" bson:"average_speed"`                   // The activity's average speed, in meters per second
-	MaxSpeed             float32       `json:"max_speed,omitempty" bson:"max_speed"`                           // The activity's max speed, in meters per second
+	AverageSpeed         float64       `json:"average_speed,omitempty" bson:"average_speed"`                   // The activity's average speed, in meters per second
+	MaxSpeed             float64       `json:"max_speed,omitempty" bson:"max_speed"`                           // The activity's max speed, in meters per second
 	HasKudoed            bool          `json:"has_kudoed,omitempty" bson:"has_kudoed"`                         // Whether the logged-in athlete has kudoed this activity
 	GearId               string        `json:"gear_id,omitempty" bson:"gear_id"`                               // The id of the gear for the activity
-	Kilojoules           float32       `json:"kilojoules,omitempty" bson:"kilojoules"`                         // The total work done in kilojoules during this activity. Rides only
-	AverageWatts         float32       `json:"average_watts,omitempty" bson:"average_watts"`                   // Average power output in watts during this activity. Rides only
+	Kilojoules           float64       `json:"kilojoules,omitempty" bson:"kilojoules"`                         // The total work done in kilojoules during this activity. Rides only
+	AverageWatts         float64       `json:"average_watts,omitempty" bson:"average_watts"`                   // Average power output in watts during this activity. Rides only
 	DeviceWatts          bool          `json:"device_watts,omitempty" bson:"device_watts"`                     // Whether the watts are from a power meter, false if estimated
 	MaxWatts             int           `json:"max_watts,omitempty" bson:"max_watts"`                           // Rides with power meter data only
 	WeightedAverageWatts int           `json:"weighted_average_watts,omitempty" bson:"weighted_average_watts"` // Similar to Normalized Power. Rides with power meter data only
@@ -570,30 +570,30 @@ type TimedZoneRange struct {
 
 // DetailedActivity
 type DetailedActivity struct {
-	Id                   int64                    `json:"id,omitempty" bson:"id"`                                         // The unique identifier of the activity
-	ExternalId           string                   `json:"external_id,omitempty" bson:"external_id"`                       // The identifier provided at upload time
-	UploadId             int64                    `json:"upload_id,omitempty" bson:"upload_id"`                           // The identifier of the upload that resulted in this activity
-	Athlete              MetaAthlete              `json:"athlete,omitempty" bson:"athlete"`                               // An instance of MetaAthlete.
+	ID                   int64                    `json:"id,omitempty" bson:"id"`                                         // The unique identifier of the activity
+	ExternalID           string                   `json:"external_id,omitempty" bson:"external_id"`                       // The identifier provided at upload time
+	UploadID             int64                    `json:"upload_id,omitempty" bson:"upload_id"`                           // The identifier of the upload that resulted in this activity
+	Athlete              *MetaAthlete             `json:"athlete,omitempty" bson:"athlete"`                               // An instance of MetaAthlete.
 	Name                 string                   `json:"name,omitempty" bson:"name"`                                     // The name of the activity
-	Distance             float32                  `json:"distance,omitempty" bson:"distance"`                             // The activity's distance, in meters
+	Distance             float64                  `json:"distance,omitempty" bson:"distance"`                             // The activity's distance, in meters
 	MovingTime           int                      `json:"moving_time,omitempty" bson:"moving_time"`                       // The activity's moving time, in seconds
 	ElapsedTime          int                      `json:"elapsed_time,omitempty" bson:"elapsed_time"`                     // The activity's elapsed time, in seconds
-	TotalElevationGain   float32                  `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`     // The activity's total elevation gain.
-	ElevHigh             float32                  `json:"elev_high,omitempty" bson:"elev_high"`                           // The activity's highest elevation, in meters
-	ElevLow              float32                  `json:"elev_low,omitempty" bson:"elev_low"`                             // The activity's lowest elevation, in meters
+	TotalElevationGain   float64                  `json:"total_elevation_gain,omitempty" bson:"total_elevation_gain"`     // The activity's total elevation gain.
+	ElevHigh             float64                  `json:"elev_high,omitempty" bson:"elev_high"`                           // The activity's highest elevation, in meters
+	ElevLow              float64                  `json:"elev_low,omitempty" bson:"elev_low"`                             // The activity's lowest elevation, in meters
 	Type                 string                   `json:"type,omitempty" bson:"type"`                                     // An instance of ActivityType.
 	StartDate            time.Time                `json:"start_date,omitempty" bson:"start_date"`                         // The time at which the activity was started.
 	StartDateLocal       time.Time                `json:"start_date_local,omitempty" bson:"start_date_local"`             // The time at which the activity was started in the local timezone.
 	Timezone             string                   `json:"timezone,omitempty" bson:"timezone"`                             // The timezone of the activity
-	StartLatlng          LatLng                   `json:"start_latlng,omitempty" bson:"start_latlng"`                     // An instance of LatLng.
-	EndLatlng            LatLng                   `json:"end_latlng,omitempty" bson:"end_latlng"`                         // An instance of LatLng.
+	StartLatlng          *LatLng                  `json:"start_latlng,omitempty" bson:"start_latlng"`                     // An instance of LatLng.
+	EndLatlng            *LatLng                  `json:"end_latlng,omitempty" bson:"end_latlng"`                         // An instance of LatLng.
 	AchievementCount     int                      `json:"achievement_count,omitempty" bson:"achievement_count"`           // The number of achievements gained during this activity
 	KudosCount           int                      `json:"kudos_count,omitempty" bson:"kudos_count"`                       // The number of kudos given for this activity
 	CommentCount         int                      `json:"comment_count,omitempty" bson:"comment_count"`                   // The number of comments for this activity
 	AthleteCount         int                      `json:"athlete_count,omitempty" bson:"athlete_count"`                   // The number of athletes for taking part in a group activity
 	PhotoCount           int                      `json:"photo_count,omitempty" bson:"photo_count"`                       // The number of Instagram photos for this activity
 	TotalPhotoCount      int                      `json:"total_photo_count,omitempty" bson:"total_photo_count"`           // The number of Instagram and Strava photos for this activity
-	Map                  PolylineMap              `json:"map,omitempty" bson:"map"`                                       // An instance of PolylineMap.
+	Map                  *PolylineMap             `json:"map,omitempty" bson:"map"`                                       // An instance of PolylineMap.
 	Trainer              bool                     `json:"trainer,omitempty" bson:"trainer"`                               // Whether this activity was recorded on a training machine
 	Commute              bool                     `json:"commute,omitempty" bson:"commute"`                               // Whether this activity is a commute
 	Manual               bool                     `json:"manual,omitempty" bson:"manual"`                                 // Whether this activity was created manually
@@ -601,19 +601,19 @@ type DetailedActivity struct {
 	Flagged              bool                     `json:"flagged,omitempty" bson:"flagged"`                               // Whether this activity is flagged
 	WorkoutType          int                      `json:"workout_type,omitempty" bson:"workout_type"`                     // The activity's workout type
 	UploadIdStr          string                   `json:"upload_id_str,omitempty" bson:"upload_id_str"`                   // The unique identifier of the upload in string format
-	AverageSpeed         float32                  `json:"average_speed,omitempty" bson:"average_speed"`                   // The activity's average speed, in meters per second
-	MaxSpeed             float32                  `json:"max_speed,omitempty" bson:"max_speed"`                           // The activity's max speed, in meters per second
+	AverageSpeed         float64                  `json:"average_speed,omitempty" bson:"average_speed"`                   // The activity's average speed, in meters per second
+	MaxSpeed             float64                  `json:"max_speed,omitempty" bson:"max_speed"`                           // The activity's max speed, in meters per second
 	HasKudoed            bool                     `json:"has_kudoed,omitempty" bson:"has_kudoed"`                         // Whether the logged-in athlete has kudoed this activity
 	GearId               string                   `json:"gear_id,omitempty" bson:"gear_id"`                               // The id of the gear for the activity
-	Kilojoules           float32                  `json:"kilojoules,omitempty" bson:"kilojoules"`                         // The total work done in kilojoules during this activity. Rides only
-	AverageWatts         float32                  `json:"average_watts,omitempty" bson:"average_watts"`                   // Average power output in watts during this activity. Rides only
+	Kilojoules           float64                  `json:"kilojoules,omitempty" bson:"kilojoules"`                         // The total work done in kilojoules during this activity. Rides only
+	AverageWatts         float64                  `json:"average_watts,omitempty" bson:"average_watts"`                   // Average power output in watts during this activity. Rides only
 	DeviceWatts          bool                     `json:"device_watts,omitempty" bson:"device_watts"`                     // Whether the watts are from a power meter, false if estimated
 	MaxWatts             int                      `json:"max_watts,omitempty" bson:"max_watts"`                           // Rides with power meter data only
 	WeightedAverageWatts int                      `json:"weighted_average_watts,omitempty" bson:"weighted_average_watts"` // Similar to Normalized Power. Rides with power meter data only
 	Description          string                   `json:"description,omitempty" bson:"description"`                       // The description of the activity
-	Photos               PhotosSummary            `json:"photos,omitempty" bson:"photos"`                                 // An instance of PhotosSummary.
-	Gear                 SummaryGear              `json:"gear,omitempty" bson:"gear"`                                     // An instance of SummaryGear.
-	Calories             float32                  `json:"calories,omitempty" bson:"calories"`                             // The number of kilocalories consumed during this activity
+	Photos               *PhotosSummary           `json:"photos,omitempty" bson:"photos"`                                 // An instance of PhotosSummary.
+	Gear                 *SummaryGear             `json:"gear,omitempty" bson:"gear"`                                     // An instance of SummaryGear.
+	Calories             float64                  `json:"calories,omitempty" bson:"calories"`                             // The number of kilocalories consumed during this activity
 	SegmentEfforts       []*DetailedSegmentEffort `json:"segment_efforts,omitempty" bson:"segment_efforts"`               // A collection of DetailedSegmentEffort objects.
 	DeviceName           string                   `json:"device_name,omitempty" bson:"device_name"`                       // The name of the device used to record the activity
 	EmbedToken           string                   `json:"embed_token,omitempty" bson:"embed_token"`                       // The token used to embed a Strava activity
@@ -621,8 +621,8 @@ type DetailedActivity struct {
 	SplitsStandard       []*Split                 `json:"splits_standard,omitempty" bson:"splits_standard"`               // The splits of this activity in imperial units (for runs)
 	Laps                 []*Lap                   `json:"laps,omitempty" bson:"laps"`                                     // A collection of Lap objects.
 	BestEfforts          []*DetailedSegmentEffort `json:"best_efforts,omitempty" bson:"best_efforts"`
-	AverageHeartrate     float32                  `json:"average_heartrate,omitempty" bson:"average_heartrate"` // The heart heart rate of the athlete during this effort
-	MaxHeartrate         float32                  `json:"max_heartrate,omitempty" bson:"max_heartrate"`         // The maximum heart rate of the athlete during this effort
+	AverageHeartrate     float64                  `json:"average_heartrate,omitempty" bson:"average_heartrate"` // The heart heart rate of the athlete during this effort
+	MaxHeartrate         float64                  `json:"max_heartrate,omitempty" bson:"max_heartrate"`         // The maximum heart rate of the athlete during this effort
 }
 
 // DetailedAthlete
@@ -643,9 +643,9 @@ type DetailedAthlete struct {
 	UpdatedAt             time.Time    `json:"updated_at,omitempty" bson:"updated_at"`                         // The time at which the athlete was last updated.
 	FollowerCount         int          `json:"follower_count,omitempty" bson:"follower_count"`                 // The athlete's follower count.
 	FriendCount           int          `json:"friend_count,omitempty" bson:"friend_count"`                     // The athlete's friend count.
-	MeasurementPreference string       `json:"measurement_preference,omitempty" bson:"measurement_preference"` // The athlete's preferred unit system. May take one of the following values: feet, meters
+	MeasurementPreference string       `json:"measurement_preference,omitempty" bson:"measurement_preference"` // The athlete's preferred unit systex. May take one of the following values: feet, meters
 	Ftp                   int          `json:"ftp,omitempty" bson:"ftp"`                                       // The athlete's FTP (Functional Threshold Power).
-	Weight                float32      `json:"weight,omitempty" bson:"weight"`                                 // The athlete's weight.
+	Weight                float64      `json:"weight,omitempty" bson:"weight"`                                 // The athlete's weight.
 	Clubs                 *SummaryClub `json:"clubs,omitempty" bson:"clubs"`                                   // The athlete's clubs.
 	Bikes                 *SummaryGear `json:"bikes,omitempty" bson:"bikes"`                                   // The athlete's bikes.
 	Shoes                 *SummaryGear `json:"shoes,omitempty" bson:"shoes"`                                   // The athlete's shoes.

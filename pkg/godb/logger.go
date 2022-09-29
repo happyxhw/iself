@@ -7,7 +7,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	gLogger "gorm.io/gorm/logger"
+
+	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
 )
 
 type gormLogger struct {
@@ -28,6 +31,9 @@ func newLogger(logger *zap.Logger, level string, slowThreshold time.Duration, sq
 		ll = gLogger.Error
 	case "silent":
 		ll = gLogger.Silent
+	}
+	if sqlLenThreshold == 0 {
+		sqlLenThreshold = 1000
 	}
 	gl := gormLogger{
 		logger:          logger,
@@ -72,23 +78,23 @@ func (gl gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (stri
 		return
 	}
 	elapsed := time.Since(begin)
-	reqID, _ := ctx.Value(echo.HeaderXRequestID).(string)
+	reqID := cx.RequestID(ctx)
 	switch {
-	case err != nil && gl.level >= gLogger.Error:
+	case gl.level >= gLogger.Error && err != nil && err != gorm.ErrRecordNotFound:
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
 		gl.logger.Error("[GORM]", zap.Error(err), zap.Int64("elapsed", elapsed.Milliseconds()),
-			zap.Int64("rows", rows), zap.String("sql", sql), zap.String("X-Request-ID", reqID))
-	case gl.slowThreshold != 0 && elapsed > gl.slowThreshold && gl.level >= gLogger.Warn:
+			zap.Int64("rows", rows), zap.String("sql", sql), zap.String(echo.HeaderXRequestID, reqID))
+	case gl.level >= gLogger.Warn && gl.slowThreshold != 0 && elapsed > gl.slowThreshold:
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
 		gl.logger.Warn("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()),
-			zap.Int64("rows", rows), zap.String("sql", sql), zap.String("X-Request-ID", reqID))
+			zap.Int64("rows", rows), zap.String("sql", sql), zap.String(echo.HeaderXRequestID, reqID))
 	case gl.level >= gLogger.Info:
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
 		gl.logger.Info("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()),
-			zap.Int64("rows", rows), zap.String("sql", sql), zap.String("X-Request-ID", reqID))
+			zap.Int64("rows", rows), zap.String("sql", sql), zap.String(echo.HeaderXRequestID, reqID))
 	}
 }
 

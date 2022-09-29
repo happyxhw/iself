@@ -2,21 +2,22 @@
 package ws
 
 import (
-	"errors"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/websocket"
-)
+	"go.uber.org/zap"
 
-var (
-	// ErrClientOffline client offline
-	ErrClientOffline = errors.New("client offline")
+	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 )
 
 // Msg info sent to Client
 type Msg struct {
-	Timestamp int64 `json:"timestamp"`
+	Action       string `json:"action"`
+	ID           string `json:"id"`
+	ErrorMessage string `json:"error_message"`
+	Data         string `json:"data"`
+	Timestamp    int64  `json:"timestamp"`
 }
 
 // Hub websocket srv
@@ -68,5 +69,13 @@ func (s *Hub) Remove(c *Client) {
 	delete(s.clients[c.userID], c.id)
 	if len(s.clients[c.userID]) == 0 {
 		delete(s.clients, c.userID)
+	}
+}
+
+func (s *Hub) SendToUser(userID int64, msg *Msg) {
+	for _, cli := range s.clients[userID] {
+		if err := cli.Send(msg); err != nil {
+			log.Warn("send msg", zap.Error(err))
+		}
 	}
 }

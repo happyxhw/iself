@@ -12,6 +12,8 @@ import (
 	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
 )
 
 const (
@@ -178,6 +180,5 @@ func Sync() {
 }
 
 func Ctx(ctx context.Context) zap.Field {
-	reqID, _ := ctx.Value(echo.HeaderXRequestID).(string)
-	return zap.String(echo.HeaderXRequestID, reqID)
+	return zap.String(echo.HeaderXRequestID, cx.RequestID(ctx))
 }

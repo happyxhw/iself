@@ -12,8 +12,9 @@ import (
 	"go.uber.org/zap"
 
 	"git.happyxhw.cn/happyxhw/iself/component"
-	"git.happyxhw.cn/happyxhw/iself/pkg/em"
+	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+
 	stravaRouter "git.happyxhw.cn/happyxhw/iself/service/strava"
 	userRouter "git.happyxhw.cn/happyxhw/iself/service/user"
 	weatherRouter "git.happyxhw.cn/happyxhw/iself/service/weather"
@@ -24,9 +25,10 @@ func Serve() {
 	e := newRouter()
 
 	s := &http.Server{
-		Addr:           viper.GetString("server.addr"),
-		Handler:        e,
-		MaxHeaderBytes: 1 << 20,
+		Addr:              viper.GetString("server.addr"),
+		Handler:           e,
+		MaxHeaderBytes:    1 << 20,
+		ReadHeaderTimeout: time.Second * 5,
 	}
 
 	go func() {
@@ -49,8 +51,8 @@ func Serve() {
 func newRouter() *echo.Echo {
 	e := echo.New()
 	e.Debug = viper.GetBool("server.debug")
-	e.HTTPErrorHandler = em.ErrHandler(e)
-	e.Validator = em.NewValidator()
+	e.HTTPErrorHandler = ex.ErrHandler(e)
+	e.Validator = ex.NewValidator()
 	e.IPExtractor = echo.ExtractIPFromRealIPHeader(echo.TrustLinkLocal(true), echo.TrustPrivateNet(true))
 
 	component.InitComponent()

@@ -15,8 +15,8 @@ import (
 	"go.uber.org/zap"
 
 	"git.happyxhw.cn/happyxhw/iself/component"
-	"git.happyxhw.cn/happyxhw/iself/pkg/em"
 
+	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 	"git.happyxhw.cn/happyxhw/iself/third_party"
 )
@@ -30,11 +30,13 @@ func initGlobalMiddleware(e *echo.Echo) {
 		},
 	)
 	// recovery
-	e.Use(middleware.Recover())
+	if !e.Debug {
+		e.Use(ex.Recover())
+	}
 	// request id
-	e.Use(em.RequestID())
+	e.Use(ex.RequestID())
 	// access log
-	e.Use(em.Logger(apiLogger))
+	e.Use(ex.Logger(apiLogger))
 
 	initSecure(e)
 	initRateLimiter(e)
@@ -44,7 +46,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 }
 
 func initSession(e *echo.Echo) {
-	rdbStore := em.NewStore(component.RDB(), viper.GetString("session.prefix"), []byte(viper.GetString("session.key")))
+	rdbStore := ex.NewStore(component.RDB(), viper.GetString("session.prefix"), []byte(viper.GetString("session.key")))
 	e.Use(session.MiddlewareWithConfig(session.Config{
 		Store: rdbStore,
 	}))
@@ -52,16 +54,18 @@ func initSession(e *echo.Echo) {
 
 func initCsrf(e *echo.Echo) {
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		TokenLength:    32,
 		TokenLookup:    "header:X-CSRF-TOKEN",
 		ContextKey:     "csrf",
 		CookieName:     "_csrf",
 		CookieDomain:   viper.GetString("session.domain"),
-		CookiePath:     "/",
+		CookiePath:     viper.GetString("session.path"),
 		CookieSecure:   viper.GetBool("session.secure"),
 		CookieHTTPOnly: false,
 		CookieSameSite: http.SameSiteLaxMode,
 		Skipper: func(c echo.Context) bool {
+			if e.Debug {
+				return true
+			}
 			if strings.HasPrefix(c.Path(), "/api/auth") {
 				return true
 			}
@@ -72,16 +76,16 @@ func initCsrf(e *echo.Echo) {
 
 func initRateLimiter(e *echo.Echo) {
 	store, err := sredis.NewStoreWithOptions(component.RDB(), limiter.StoreOptions{
-		Prefix: "limiter",
+		Prefix: viper.GetString("ratelimit.prefix"),
 	})
 	if err != nil {
 		log.Fatal("init limiter", zap.Error(err))
 	}
 	rate := limiter.Rate{
-		Period: 1 * time.Minute,
-		Limit:  120,
+		Period: time.Duration(viper.GetInt("ratelimit.period")) * time.Second,
+		Limit:  viper.GetInt64("ratelimit.limit"),
 	}
-	e.Use(em.IPRateLimit(store, rate))
+	e.Use(ex.IPRateLimit(store, rate))
 }
 
 func initSecure(e *echo.Echo) {

@@ -30,8 +30,8 @@ func NewMailer(c *Config) *Mailer {
 	}
 }
 
-// DialAndSend dial and send email
-func (m *Mailer) DialAndSend(to, subj, body string) error {
+// Send dial and send email
+func (m *Mailer) Send(to, subj, body string) error {
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", m.from)
 	mail.SetHeader("To", to)

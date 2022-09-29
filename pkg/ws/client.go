@@ -13,6 +13,10 @@ import (
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 )
 
+var (
+	ErrClientClosed = errors.New("client closed")
+)
+
 const (
 	defaultWriteWait = 60 * time.Second
 
@@ -27,6 +31,8 @@ type Client struct {
 	conn    *websocket.Conn // websocket conn
 	stopCh  chan struct{}   // signal to stop client
 	onClose func(*Client)   // do func when conn close
+	stopped bool
+	mu      *sync.Mutex
 
 	hub   *Hub
 	once  sync.Once
@@ -35,11 +41,10 @@ type Client struct {
 
 	id     string // client id
 	userID int64  // client user id
-	token  string // user token
 }
 
 // NewClient return client instance
-func NewClient(conn *websocket.Conn, stream *Hub, id, token string, userID int64, readFunc func([]byte)) *Client {
+func NewClient(conn *websocket.Conn, stream *Hub, id string, userID int64, readFunc func([]byte)) *Client {
 	cli := Client{
 		conn: conn,
 		hub:  stream,
@@ -47,10 +52,10 @@ func NewClient(conn *websocket.Conn, stream *Hub, id, token string, userID int64
 		stopCh: make(chan struct{}, 1),
 		ch:     make(chan *Msg),
 		errCh:  make(chan error),
+		mu:     &sync.Mutex{},
 
 		id:     id,
 		userID: userID,
-		token:  token,
 	}
 	go cli.startReading(readFunc)
 	go cli.startPingHandler()
@@ -69,6 +74,9 @@ func (c *Client) Close() {
 // close conn
 func (c *Client) close() {
 	c.once.Do(func() {
+		c.mu.Lock()
+		c.stopped = true
+		defer c.mu.Unlock()
 		c.stopCh <- struct{}{}
 		_ = c.conn.Close()
 		if c.onClose != nil {
@@ -139,8 +147,13 @@ func (c *Client) startPingHandler() {
 }
 
 func (c *Client) Send(msg *Msg) error {
+	c.mu.Lock()
+	if c.stopped {
+		return ErrClientClosed
+	}
+	defer c.mu.Unlock()
 	var err error
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5) //nolint:gomnd
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	select {
 	case c.ch <- msg:

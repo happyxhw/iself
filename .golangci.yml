@@ -59,7 +59,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -82,15 +81,12 @@ linters:
     - nakedret
     - noctx
     - nolintlint
-    - rowserrcheck
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
 
 issues:
@@ -111,6 +107,7 @@ run:
   skip-dirs:
     - third_party
     - tests
+    - mocks
 
 output:
   # colored-line-number|line-number|json|tab|checkstyle, default is "colored-line-number"

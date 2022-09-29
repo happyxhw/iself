@@ -5,8 +5,6 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/endpoints"
-	"golang.org/x/oauth2/github"
-	"golang.org/x/oauth2/google"
 	"gorm.io/gorm"
 
 	"github.com/spf13/viper"
@@ -15,13 +13,14 @@ import (
 	"git.happyxhw.cn/happyxhw/iself/pkg/goredis"
 	"git.happyxhw.cn/happyxhw/iself/pkg/log"
 	"git.happyxhw.cn/happyxhw/iself/pkg/mailer"
+	"git.happyxhw.cn/happyxhw/iself/pkg/oauth2x"
 )
 
 var (
-	db         *gorm.DB
-	rdb        *redis.Client
-	ma         *mailer.Mailer
-	oauth2Conf map[string]*oauth2.Config
+	db              *gorm.DB
+	rdb             *redis.Client
+	ma              *mailer.Mailer
+	oauth2xProvider map[string]oauth2x.Oauth2x
 )
 
 // DB return db
@@ -34,9 +33,9 @@ func RDB() *redis.Client {
 	return rdb
 }
 
-// Oauth2Conf oauth2 conf map
-func Oauth2Conf() map[string]*oauth2.Config {
-	return oauth2Conf
+// Oauth2Provider oauth2 cli map
+func Oauth2Provider() map[string]oauth2x.Oauth2x {
+	return oauth2xProvider
 }
 
 // Mailer send email
@@ -95,24 +94,16 @@ type oauth2Client struct {
 func initOauth2Conf() {
 	var clients []*oauth2Client
 	_ = viper.UnmarshalKey("oauth2.client", &clients)
-	oauth2Conf = make(map[string]*oauth2.Config, len(clients))
+	oauth2xProvider = make(map[string]oauth2x.Oauth2x, len(clients))
 	for _, c := range clients {
-		var endpoint oauth2.Endpoint
-		switch c.Name {
-		case "github":
-			endpoint = github.Endpoint
-		case "google":
-			endpoint = google.Endpoint
-		case "strava":
-			endpoint = endpoints.Strava
-		default:
-			continue
-		}
-		oauth2Conf[c.Name] = &oauth2.Config{
-			ClientID:     c.ClientID,
-			ClientSecret: c.ClientSecret,
-			Endpoint:     endpoint,
-			Scopes:       c.Scopes,
+		if c.Name == oauth2x.StravaSource {
+			conf := oauth2.Config{
+				ClientID:     c.ClientID,
+				ClientSecret: c.ClientSecret,
+				Endpoint:     endpoints.Strava,
+				Scopes:       c.Scopes,
+			}
+			oauth2xProvider[c.Name] = oauth2x.NewStrava(&conf)
 		}
 	}
 }
