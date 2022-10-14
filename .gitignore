@@ -1,6 +1,5 @@
 # IDE
 .idea
-.vscode
 
 # project
 logs
@@ -11,3 +10,5 @@ iself
 
 # config
 config
+
+tmp
