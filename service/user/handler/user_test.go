@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -270,6 +271,7 @@ func TestUser_ResetPassword(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	token, _ = url.QueryUnescape(token)
 	key := fmt.Sprintf("reset:%s", email)
 	req := types.ResetPasswordReq{
 		Password: "456",
@@ -309,6 +311,7 @@ func TestUser_Activate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	token, _ = url.QueryUnescape(token)
 	key := fmt.Sprintf("active:%s", email)
 	params := model.UserParam{
 		Status: util.Int(int(model.ActivatedStatus)),

@@ -200,12 +200,23 @@ func TestUserRepo_Query(t *testing.T) {
 				AddRow(11),
 		)
 	sql2 := `
-		SELECT "id","name","email" FROM "user" 
+		SELECT "id" FROM "user"
 		WHERE "user"."name" = $1 AND "user"."status" = $2 AND "user"."deleted_at" = $3
 		ORDER BY id DESC LIMIT 10 OFFSET 10
 	`
 	mock.ExpectQuery(sql2).
 		WithArgs(mockUser.Name, 1, 0).
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id"}).
+				AddRow(mockUser.ID),
+		)
+	sql3 := `
+		SELECT "id","name","email" FROM "user" 
+		WHERE "user"."name" = $1 AND "user"."status" = $2 AND "user"."deleted_at" = $3 AND id IN ($4)
+		ORDER BY id DESC
+	`
+	mock.ExpectQuery(sql3).
+		WithArgs(mockUser.Name, 1, 0, sqlmock.AnyArg()).
 		WillReturnRows(
 			sqlmock.NewRows([]string{"id", "name", "email"}).
 				AddRow(mockUser.ID, mockUser.Name, mockUser.Email),
