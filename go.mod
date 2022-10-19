@@ -1,4 +1,4 @@
-module git.happyxhw.cn/happyxhw/iself
+module github.com/happyxhw/iself
 
 go 1.18
 

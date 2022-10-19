@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/pkg/strava"
 )
 
 // StravaActivityDetail 活动详细信息

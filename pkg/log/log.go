@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/cx"
 )
 
 const (

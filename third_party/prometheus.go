@@ -39,7 +39,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/expfmt"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/ex"
 )
 
 var defaultMetricPath = "/metrics"

@@ -7,9 +7,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/pkg/trans"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/pkg/trans"
 )
 
 type StravaRepo struct {

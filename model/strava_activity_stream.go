@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"github.com/happyxhw/iself/pkg/strava"
 )
 
 // StravaActivityStream stream 信息

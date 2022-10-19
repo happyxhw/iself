@@ -8,7 +8,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/cx"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"

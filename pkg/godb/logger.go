@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 	gLogger "gorm.io/gorm/logger"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/cx"
 )
 
 type gormLogger struct {

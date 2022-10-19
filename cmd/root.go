@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/service"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/service"
 )
 
 var (

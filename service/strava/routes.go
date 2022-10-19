@@ -3,13 +3,13 @@ package strava
 import (
 	"github.com/labstack/echo/v4"
 
-	"git.happyxhw.cn/happyxhw/iself/component"
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/pkg/oauth2x"
-	"git.happyxhw.cn/happyxhw/iself/pkg/trans"
-	"git.happyxhw.cn/happyxhw/iself/repo"
-	"git.happyxhw.cn/happyxhw/iself/service/strava/controller"
-	"git.happyxhw.cn/happyxhw/iself/service/strava/handler"
+	"github.com/happyxhw/iself/component"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/oauth2x"
+	"github.com/happyxhw/iself/pkg/trans"
+	"github.com/happyxhw/iself/repo"
+	"github.com/happyxhw/iself/service/strava/controller"
+	"github.com/happyxhw/iself/service/strava/handler"
 )
 
 // InitRouter 初始化用户路由

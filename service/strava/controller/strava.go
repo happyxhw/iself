@@ -6,12 +6,12 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
-	"git.happyxhw.cn/happyxhw/iself/service/strava/handler"
-	"git.happyxhw.cn/happyxhw/iself/service/strava/types"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/strava"
+	"github.com/happyxhw/iself/service/strava/handler"
+	"github.com/happyxhw/iself/service/strava/types"
 )
 
 const (

@@ -27,7 +27,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: git.happyxhw.cn/happyxhw/iself
+    local-prefixes: github.com/happyxhw/iself
   gomnd:
     settings:
       mnd:

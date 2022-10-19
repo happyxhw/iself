@@ -8,16 +8,16 @@ import (
 
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/pkg/oauth2x"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
-	"git.happyxhw.cn/happyxhw/iself/pkg/trans"
-	"git.happyxhw.cn/happyxhw/iself/pkg/util"
-	"git.happyxhw.cn/happyxhw/iself/repo"
-	"git.happyxhw.cn/happyxhw/iself/service/strava/types"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/oauth2x"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/pkg/strava"
+	"github.com/happyxhw/iself/pkg/trans"
+	"github.com/happyxhw/iself/pkg/util"
+	"github.com/happyxhw/iself/repo"
+	"github.com/happyxhw/iself/service/strava/types"
 )
 
 type Strava struct {

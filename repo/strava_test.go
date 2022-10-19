@@ -7,9 +7,9 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/mymock"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/mymock"
+	"github.com/happyxhw/iself/pkg/query"
 )
 
 var mockAct = model.StravaActivityDetail{

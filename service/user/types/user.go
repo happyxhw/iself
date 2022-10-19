@@ -5,7 +5,7 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
+	"github.com/happyxhw/iself/model"
 )
 
 // User schema

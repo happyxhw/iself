@@ -3,7 +3,7 @@ package ex
 import (
 	"github.com/labstack/echo/v4"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/util"
+	"github.com/happyxhw/iself/pkg/util"
 )
 
 // RequestID 获取并设置 request id

@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/log"
 )
 
 const appID = "82a3f058f5d7010b2a63a18dff557de7"

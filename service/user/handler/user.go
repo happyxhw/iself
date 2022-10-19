@@ -13,14 +13,14 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/aes"
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/pkg/oauth2x"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/pkg/util"
-	"git.happyxhw.cn/happyxhw/iself/service/user/types"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/aes"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/oauth2x"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/pkg/util"
+	"github.com/happyxhw/iself/service/user/types"
 )
 
 type User struct {

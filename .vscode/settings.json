@@ -6,7 +6,7 @@
         "mymock"
     ],
     "gopls": {
-        "formatting.local": "git.happyxhw.cn/happyxhw/iself"
+        "formatting.local": "github.com/happyxhw/iself"
     },
     "workbench.colorCustomizations": {
         "editor.selectionBackground": "#ff4757",

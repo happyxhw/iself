@@ -14,11 +14,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/component"
+	"github.com/happyxhw/iself/component"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/third_party"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/third_party"
 )
 
 func initGlobalMiddleware(e *echo.Echo) {
