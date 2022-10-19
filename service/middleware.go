@@ -25,7 +25,6 @@ func initGlobalMiddleware(e *echo.Echo) {
 	apiLogger := log.NewLogger(
 		&log.Config{
 			Level:   viper.GetString("log.web.level"),
-			Path:    viper.GetString("log.web.path"),
 			Encoder: viper.GetString("log.encoder"),
 		},
 	)

@@ -58,7 +58,6 @@ func initDB() {
 	dbC.Logger = log.NewLogger(
 		&log.Config{
 			Level:   viper.GetString("log.gorm.level"),
-			Path:    viper.GetString("log.gorm.path"),
 			Encoder: viper.GetString("log.encoder"),
 		},
 		zap.AddCallerSkip(3), zap.AddCaller())

@@ -60,7 +60,7 @@ func initConfig() {
 
 func start() {
 	log.InitAppLogger(
-		&log.Config{Level: viper.GetString("log.app.level"), Path: viper.GetString("log.app.path"),
+		&log.Config{Level: viper.GetString("log.app.level"),
 			Encoder: viper.GetString("log.encoder")},
 		zap.AddCallerSkip(1), zap.AddCaller())
 

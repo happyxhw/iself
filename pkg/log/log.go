@@ -2,14 +2,11 @@ package log
 
 import (
 	"context"
-	"io"
-	"log"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -24,7 +21,6 @@ const (
 // Config for log
 type Config struct {
 	Level      string
-	Path       string
 	Encoder    string
 	MaxAge     time.Duration `mapstructure:"max_age"`
 	RotateTime time.Duration `mapstructure:"rotate_time"`
@@ -76,53 +72,7 @@ func NewLogger(c *Config, opts ...zap.Option) *zap.Logger {
 		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		encoder = zapcore.NewConsoleEncoder(encoderConfig)
 	}
-	var cores []zapcore.Core
-	// 输出到文件，按天分割，warn级别及以上的会把err日志单独输出到 _err.log
-	if c.Path != "" {
-		if !strings.HasSuffix(c.Path, ".log") {
-			c.Path += ".log"
-		}
-		w := writer(c)
-		cores = append(cores, zapcore.NewCore(encoder, zapcore.AddSync(w), level))
-		if zapLevel == zap.InfoLevel || zapLevel == zap.DebugLevel {
-			c.Path = strings.TrimSuffix(c.Path, ".log")
-			c.Path += "_err.log"
-			errW := writer(c)
-			cores = append(cores, zapcore.NewCore(encoder, zapcore.AddSync(errW), zap.WarnLevel))
-		}
-	} else {
-		cores = append(cores, zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), level))
-	}
-	// 输出到终端
-	core := zapcore.NewTee(cores...)
-	return zap.New(core, opts...)
-}
-
-// log rotate
-func writer(c *Config) io.Writer {
-	if c.MaxAge == 0 {
-		c.MaxAge = defaultMaxAge
-	}
-	if c.RotateTime == 0 {
-		c.RotateTime = defaultRotateTime
-	}
-	opts := []rotateLogs.Option{
-		rotateLogs.WithLinkName(c.Path),
-		rotateLogs.WithMaxAge(c.MaxAge),
-		rotateLogs.WithRotationTime(c.RotateTime),
-	}
-	location, err := time.LoadLocation("Asia/Shanghai")
-	if err == nil {
-		opts = append(opts, rotateLogs.WithLocation(location))
-	}
-	hook, err := rotateLogs.New(
-		c.Path+".%Y%m%d",
-		opts...,
-	)
-	if err != nil {
-		log.Fatalf("init rotatelogs err: %+v", err)
-	}
-	return hook
+	return zap.New(zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), level), opts...)
 }
 
 // level string to zap level
