@@ -1,7 +1,9 @@
-package em
+package ex
 
 import (
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 /*
@@ -25,6 +27,7 @@ var (
 	ErrReachLimit = NewError(http.StatusTooManyRequests, 40003, "too many requests")
 	ErrParam      = NewError(http.StatusBadRequest, 40005, "invalid parameters")
 	ErrNotFound   = NewError(http.StatusNotFound, 40006, "resource not found")
+	ErrConflict   = NewError(http.StatusConflict, 40007, "resource exists")
 
 	ErrInternal = NewError(http.StatusInternalServerError, 50000, "internal server error")
 	ErrDB       = NewError(http.StatusInternalServerError, 50001, "db error")
@@ -32,3 +35,21 @@ var (
 
 	ErrThirdAPI = NewError(http.StatusServiceUnavailable, 60000, "third api error")
 )
+
+// OK 正常返回
+func OK(c echo.Context, data interface{}) error {
+	if data == nil {
+		return c.NoContent(http.StatusOK)
+	}
+	return c.JSON(http.StatusOK, data)
+}
+
+func Bind(c echo.Context, target interface{}) *Error {
+	if err := c.Bind(target); err != nil {
+		return ErrParam.Wrap(err)
+	}
+	if err := c.Validate(target); err != nil {
+		return ErrParam.Wrap(err)
+	}
+	return nil
+}

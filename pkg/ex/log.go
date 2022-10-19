@@ -1,4 +1,4 @@
-package em
+package ex
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Logger for api access
+// Logger for types access
 func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -33,11 +33,13 @@ func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 
 			var errCode int
 			var errMsg string
-			if he, ok := err.(*Error); ok {
-				errCode = he.Code
-				errMsg = he.Error()
-			} else {
-				errMsg = err.Error()
+			if err != nil {
+				if he, ok := err.(*Error); ok {
+					errCode = he.Code
+					errMsg = he.Error()
+				} else {
+					errMsg = err.Error()
+				}
 			}
 
 			fields := []zap.Field{
@@ -53,7 +55,7 @@ func Logger(logger *zap.Logger) echo.MiddlewareFunc {
 				zap.Int64("req_size", reqSize),
 				zap.Int64("resp_size", respSize),
 				zap.String("err", errMsg),
-				zap.String("request_id", id),
+				zap.String(echo.HeaderXRequestID, id),
 				zap.String("ua", req.UserAgent()),
 			}
 

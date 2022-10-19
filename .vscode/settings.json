@@ -1,0 +1,20 @@
+{
+    "go.lintTool": "golangci-lint",
+    "cSpell.words": [
+        "Heartrate",
+        "Latlng",
+        "mymock"
+    ],
+    "gopls": {
+        "formatting.local": "github.com/happyxhw/iself"
+    },
+    "workbench.colorCustomizations": {
+        "editor.selectionBackground": "#ff4757",
+        "editor.selectionHighlightBackground": "#7efa3796",
+        "editorSuggestWidget.selectedBackground": "#7f8c8d",
+        "editorSuggestWidget.highlightForeground": "#ff6a00",
+        "activityBar.background": "#013600",
+        "titleBar.activeBackground": "#024C01",
+        "titleBar.activeForeground": "#EDFFED"
+    }
+}
