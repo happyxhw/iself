@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/log"
 )
 
 type (

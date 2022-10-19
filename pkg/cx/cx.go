@@ -8,10 +8,11 @@ import (
 )
 
 type (
-	txCtx     struct{}
-	noTxCtx   struct{}
-	txLockCtx struct{}
-	traceCtx  struct{}
+	txCtx      struct{}
+	noTxCtx    struct{}
+	txLockCtx  struct{}
+	traceCtx   struct{}
+	metricsCtx struct{}
 )
 
 // NewTx wrap tx in context
@@ -51,4 +52,13 @@ func NewTraceCx(c echo.Context) context.Context {
 func RequestID(ctx context.Context) string {
 	id, _ := ctx.Value(traceCtx{}).(string)
 	return id
+}
+
+func NewMetricsCx(ctx context.Context) context.Context {
+	return context.WithValue(ctx, metricsCtx{}, true)
+}
+
+func FromMetricsCx(ctx context.Context) bool {
+	v := ctx.Value(metricsCtx{})
+	return v != nil && v.(bool)
 }

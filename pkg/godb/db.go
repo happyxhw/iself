@@ -1,15 +1,19 @@
 package godb
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
 
 	"go.uber.org/zap"
 
+	"github.com/happyxhw/iself/pkg/cx"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/plugin/prometheus"
 )
 
 var (
@@ -41,30 +45,33 @@ type Config struct {
 	Level           string
 	SlowThreshold   int `mapstructure:"slow_threshold"`
 	SQLLenThreshold int `mapstructure:"sql_len_threshold"`
+
+	MetricsPort uint32 `mapstructure:"metrics_port"`
+	Prometheus  bool
 }
 
 // NewMysqlDB return mysql db
-func NewMysqlDB(dbConfig *Config) (*gorm.DB, error) {
-	DB, err := createConnection(dbConfig, MysqlDB)
+func NewMysqlDB(cfg *Config) (*gorm.DB, error) {
+	DB, err := createConnection(cfg, MysqlDB)
 	return DB, err
 }
 
 // NewPgDB return postgresql db
-func NewPgDB(dbConfig *Config) (*gorm.DB, error) {
-	DB, err := createConnection(dbConfig, PgDB)
+func NewPgDB(cfg *Config) (*gorm.DB, error) {
+	DB, err := createConnection(cfg, PgDB)
 	return DB, err
 }
 
 // create db connection
-func createConnection(dbConfig *Config, dbType dBType) (*gorm.DB, error) {
+func createConnection(cfg *Config, dbType dBType) (*gorm.DB, error) {
 	var db *gorm.DB
 	var err error
 
-	host := dbConfig.Host
-	user := dbConfig.User
-	dbName := dbConfig.DB
-	password := dbConfig.Password
-	port := dbConfig.Port
+	host := cfg.Host
+	user := cfg.User
+	dbName := cfg.DB
+	password := cfg.Password
+	port := cfg.Port
 	if host == "" {
 		host = "127.0.0.1"
 	}
@@ -73,9 +80,9 @@ func createConnection(dbConfig *Config, dbType dBType) (*gorm.DB, error) {
 		PrepareStmt: true,
 		QueryFields: true,
 	}
-	if dbConfig.Logger != nil {
-		slowThreshold := time.Duration(dbConfig.SlowThreshold) * time.Millisecond
-		c.Logger = newLogger(dbConfig.Logger, dbConfig.Level, slowThreshold, dbConfig.SQLLenThreshold)
+	if cfg.Logger != nil {
+		slowThreshold := time.Duration(cfg.SlowThreshold) * time.Millisecond
+		c.Logger = newLogger(cfg.Logger, cfg.Level, slowThreshold, cfg.SQLLenThreshold)
 	}
 	switch dbType {
 	case MysqlDB:
@@ -105,9 +112,23 @@ func createConnection(dbConfig *Config, dbType dBType) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConns)
-	sqlDB.SetConnMaxLifetime(time.Duration(dbConfig.MaxLifeTime) * time.Second)
+	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(cfg.MaxLifeTime) * time.Second)
+
+	if cfg.Prometheus {
+		_ = db.WithContext(cx.NewMetricsCx(context.Background())).Use(prometheus.New(prometheus.Config{
+			DBName:          cfg.DB,
+			RefreshInterval: 30,
+			StartServer:     true,
+			HTTPServerPort:  cfg.MetricsPort,
+			MetricsCollector: []prometheus.MetricsCollector{
+				&prometheus.Postgres{
+					Prefix: "ifly_gorm_pg_",
+				},
+			}, // 用户自定义指标
+		}))
+	}
 
 	return db, nil
 }

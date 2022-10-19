@@ -7,9 +7,9 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
-	"git.happyxhw.cn/happyxhw/iself/pkg/mymock"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/mymock"
 )
 
 func TestTx_ExecWithTx(t *testing.T) {

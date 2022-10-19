@@ -6,8 +6,8 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/strava"
 )
 
 type Strava struct {

@@ -1,0 +1,1 @@
+[![Go](https://github.com/happyxhw/iself/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/happyxhw/iself/actions/workflows/go.yml)

@@ -3,7 +3,7 @@ package main
 import (
 	_ "github.com/golang/mock/mockgen/model"
 
-	"git.happyxhw.cn/happyxhw/iself/cmd"
+	"github.com/happyxhw/iself/cmd"
 )
 
 func main() {

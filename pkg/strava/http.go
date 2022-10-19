@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/log"
 )
 
 // do make request to strava

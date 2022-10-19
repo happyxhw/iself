@@ -6,10 +6,10 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/repo"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/repo"
 )
 
 var userLogger = log.GetLogger().Named("user")
@@ -38,7 +38,7 @@ type Cacher interface {
 	Del(ctx context.Context, key string) (int64, error)
 }
 
-//go:generate mockgen -destination=./mocks/mock_oauth2x.go -package=mocks git.happyxhw.cn/happyxhw/iself/pkg/oauth2x Oauth2x
+//go:generate mockgen -destination=./mocks/mock_oauth2x.go -package=mocks github.com/happyxhw/iself/pkg/oauth2x Oauth2x
 
 //go:generate mockgen -destination=./mocks/mock_mailer.go -package=mocks . Mailer
 type Mailer interface {

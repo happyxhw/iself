@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/service"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/service"
 )
 
 var (
@@ -60,7 +60,7 @@ func initConfig() {
 
 func start() {
 	log.InitAppLogger(
-		&log.Config{Level: viper.GetString("log.app.level"), Path: viper.GetString("log.app.path"),
+		&log.Config{Level: viper.GetString("log.app.level"),
 			Encoder: viper.GetString("log.encoder")},
 		zap.AddCallerSkip(1), zap.AddCaller())
 

@@ -1,4 +1,4 @@
-FROM happyxhw/alpine:3.15.0
+FROM happyxhw/alpine:3.16.2
 
 LABEL MAINTAINER="happyxhw"
 

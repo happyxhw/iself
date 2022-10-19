@@ -1,6 +1,6 @@
 package types
 
-import "git.happyxhw.cn/happyxhw/iself/model"
+import "github.com/happyxhw/iself/model"
 
 type Goal struct {
 	ID    int64   `json:"id"`

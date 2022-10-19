@@ -11,13 +11,13 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/component"
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/component"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/log"
 
-	stravaRouter "git.happyxhw.cn/happyxhw/iself/service/strava"
-	userRouter "git.happyxhw.cn/happyxhw/iself/service/user"
-	weatherRouter "git.happyxhw.cn/happyxhw/iself/service/weather"
+	stravaRouter "github.com/happyxhw/iself/service/strava"
+	userRouter "github.com/happyxhw/iself/service/user"
+	weatherRouter "github.com/happyxhw/iself/service/weather"
 )
 
 // Serve start web serve

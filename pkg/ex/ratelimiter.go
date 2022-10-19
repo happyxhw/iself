@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/ulule/limiter/v3"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/cx"
 )
 
 // IPRateLimit by ip

@@ -4,11 +4,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
 
-	"git.happyxhw.cn/happyxhw/iself/component"
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
-	"git.happyxhw.cn/happyxhw/iself/repo"
-	"git.happyxhw.cn/happyxhw/iself/service/user/controller"
-	"git.happyxhw.cn/happyxhw/iself/service/user/handler"
+	"github.com/happyxhw/iself/component"
+	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/repo"
+	"github.com/happyxhw/iself/service/user/controller"
+	"github.com/happyxhw/iself/service/user/handler"
 )
 
 // InitRouter 初始化用户路由

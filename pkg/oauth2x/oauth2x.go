@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
+	"github.com/happyxhw/iself/model"
 )
 
 const (

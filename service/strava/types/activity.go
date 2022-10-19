@@ -3,9 +3,9 @@ package types
 import (
 	"github.com/jinzhu/copier"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/pkg/strava"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/pkg/strava"
 )
 
 type Activity struct {

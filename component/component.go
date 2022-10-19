@@ -9,11 +9,11 @@ import (
 
 	"github.com/spf13/viper"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/godb"
-	"git.happyxhw.cn/happyxhw/iself/pkg/goredis"
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
-	"git.happyxhw.cn/happyxhw/iself/pkg/mailer"
-	"git.happyxhw.cn/happyxhw/iself/pkg/oauth2x"
+	"github.com/happyxhw/iself/pkg/godb"
+	"github.com/happyxhw/iself/pkg/goredis"
+	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/mailer"
+	"github.com/happyxhw/iself/pkg/oauth2x"
 )
 
 var (
@@ -58,7 +58,6 @@ func initDB() {
 	dbC.Logger = log.NewLogger(
 		&log.Config{
 			Level:   viper.GetString("log.gorm.level"),
-			Path:    viper.GetString("log.gorm.path"),
 			Encoder: viper.GetString("log.encoder"),
 		},
 		zap.AddCallerSkip(3), zap.AddCaller())

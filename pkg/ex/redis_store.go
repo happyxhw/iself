@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/util"
+	"github.com/happyxhw/iself/pkg/util"
 )
 
 /*

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/iself/pkg/log"
 )
 
 // Msg info sent to Client

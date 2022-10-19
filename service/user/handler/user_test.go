@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -10,11 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 
-	"git.happyxhw.cn/happyxhw/iself/model"
-	"git.happyxhw.cn/happyxhw/iself/pkg/query"
-	"git.happyxhw.cn/happyxhw/iself/pkg/util"
-	"git.happyxhw.cn/happyxhw/iself/service/user/handler/mocks"
-	"git.happyxhw.cn/happyxhw/iself/service/user/types"
+	"github.com/happyxhw/iself/model"
+	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/iself/pkg/util"
+	"github.com/happyxhw/iself/service/user/handler/mocks"
+	"github.com/happyxhw/iself/service/user/types"
 )
 
 const (
@@ -270,6 +271,7 @@ func TestUser_ResetPassword(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	token, _ = url.QueryUnescape(token)
 	key := fmt.Sprintf("reset:%s", email)
 	req := types.ResetPasswordReq{
 		Password: "456",
@@ -309,6 +311,7 @@ func TestUser_Activate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	token, _ = url.QueryUnescape(token)
 	key := fmt.Sprintf("active:%s", email)
 	params := model.UserParam{
 		Status: util.Int(int(model.ActivatedStatus)),

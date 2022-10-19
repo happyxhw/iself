@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 	gLogger "gorm.io/gorm/logger"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/cx"
+	"github.com/happyxhw/iself/pkg/cx"
 )
 
 type gormLogger struct {
@@ -91,6 +91,10 @@ func (gl gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (stri
 		gl.logger.Warn("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()),
 			zap.Int64("rows", rows), zap.String("sql", sql), zap.String(echo.HeaderXRequestID, reqID))
 	case gl.level >= gLogger.Info:
+		// 排查 prometheus 的查询
+		if cx.FromMetricsCx(ctx) {
+			return
+		}
 		sql, rows := fc()
 		sql = gl.trimSQL(sql)
 		gl.logger.Info("[GORM]", zap.Int64("elapsed", elapsed.Milliseconds()),

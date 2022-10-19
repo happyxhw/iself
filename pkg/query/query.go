@@ -97,6 +97,7 @@ func WrapPageQuery(db *gorm.DB, pp Param, out interface{}) (*PagingResult, error
 }
 
 func findPage(db *gorm.DB, pp Param, out interface{}) (int64, error) {
+	// 0. query count
 	var count int64
 	err := db.Count(&count).Error
 	if err != nil {
@@ -106,14 +107,19 @@ func findPage(db *gorm.DB, pp Param, out interface{}) (int64, error) {
 	if count == 0 || (pageIndex-1)*pageSize >= int(count) {
 		return count, nil
 	}
-
-	if pageIndex > 0 && pageSize > 0 {
-		db = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize)
-	} else if pageSize > 0 {
-		db = db.Limit(pageSize)
+	queryDB := db.Session(&gorm.Session{})
+	// 1. query id
+	var ids []int
+	err = queryDB.Offset((pageIndex-1)*pageSize).Limit(pageSize).Pluck("id", &ids).Error
+	if err != nil {
+		return 0, err
 	}
+	if len(ids) == 0 {
+		return 0, nil
+	}
+	// 2. query rows
+	err = queryDB.Where("id IN (?)", ids).Find(out).Error
 
-	err = db.Find(out).Error
 	return count, err
 }
 

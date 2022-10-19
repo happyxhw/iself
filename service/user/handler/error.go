@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"git.happyxhw.cn/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/ex"
 )
 
 var (
