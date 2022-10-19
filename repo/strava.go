@@ -52,14 +52,14 @@ func (sr *StravaRepo) QueryDetailedActivity(ctx context.Context, athleteID int64
 		db = db.Where("type = ?", *params.Type)
 	}
 	if params.Filter != "" {
-		db = db.Where("name LIKE ?", "%"+params.Filter+"%")
+		db = db.Where("name ILIKE ?", "%"+params.Filter+"%")
 	}
 
 	if len(opt.Fields) > 0 {
 		db = db.Select(opt.Fields)
 	}
 	if params.SortBy != "" {
-		if sortBy := query.ParseOrder(params.SortBy); sortBy != "" {
+		if sortBy := query.ParseOrder(params.SortBy, activitySortFn); sortBy != "" {
 			db = db.Order(sortBy)
 		}
 	}
@@ -233,4 +233,15 @@ func (sr *StravaRepo) DeleteGoal(ctx context.Context, athleteID, goalID int64) (
 	r := tx.Where("athlete_id = ? AND id = ?", athleteID, goalID).Delete(&model.StravaGoal{})
 
 	return r.RowsAffected, r.Error
+}
+
+func activitySortFn(key string) string {
+	k := map[string]bool{
+		"id":               true,
+		"start_date_local": true,
+	}
+	if k[key] {
+		return key
+	}
+	return ""
 }

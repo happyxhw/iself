@@ -59,7 +59,7 @@ func (ur *UserRepo) Query(ctx context.Context, params *model.UserParam, opt quer
 		tx = tx.Select(opt.Fields)
 	}
 	if params.SortBy != "" {
-		if sortBy := query.ParseOrder(params.SortBy); sortBy != "" {
+		if sortBy := query.ParseOrder(params.SortBy, userSortFn); sortBy != "" {
 			tx = tx.Order(sortBy)
 		}
 	}
@@ -88,4 +88,14 @@ func (ur *UserRepo) Delete(ctx context.Context, id int64) (int64, error) {
 	tx := trans.DB(ctx, ur.db.WithContext(ctx)).Model(&model.User{})
 	r := tx.Where("id = ?", id).Delete(&model.User{})
 	return r.RowsAffected, r.Error
+}
+
+func userSortFn(key string) string {
+	k := map[string]bool{
+		"id": true,
+	}
+	if k[key] {
+		return key
+	}
+	return ""
 }
