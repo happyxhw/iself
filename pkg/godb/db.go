@@ -124,7 +124,7 @@ func createConnection(cfg *Config, dbType dBType) (*gorm.DB, error) {
 			HTTPServerPort:  cfg.MetricsPort,
 			MetricsCollector: []prometheus.MetricsCollector{
 				&prometheus.Postgres{
-					Prefix: "ifly_gorm_pg_",
+					Prefix: "gorm_",
 				},
 			}, // 用户自定义指标
 		}))
