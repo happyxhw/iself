@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS strava_activity_stream;
 CREATE TABLE strava_activity_stream
 (
     id              bigint NOT NULL PRIMARY KEY,
-    "time"            jsonb,
+    "time"          jsonb,
     distance        jsonb,
     latlng          jsonb,
     altitude        jsonb,
