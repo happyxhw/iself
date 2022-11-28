@@ -3,8 +3,9 @@ package strava
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/happyxhw/iself/component"
 	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/godb"
+	"github.com/happyxhw/iself/pkg/goredis"
 	"github.com/happyxhw/iself/pkg/oauth2x"
 	"github.com/happyxhw/iself/pkg/trans"
 	"github.com/happyxhw/iself/repo"
@@ -16,11 +17,11 @@ import (
 func InitRouter(e *echo.Echo) {
 	g := e.Group("/api/strava")
 
-	transRepo := trans.NewTrans(component.DB())
-	sr := repo.NewStravaRepo(component.DB())
-	cacher := repo.NewCacher(component.RDB())
+	transRepo := trans.NewTrans(godb.DefaultDB())
+	sr := repo.NewStravaRepo(godb.DefaultDB())
+	cacher := repo.NewCacher(goredis.DefaultRDB())
 	tr := repo.NewTokenRepo(cacher)
-	auth := component.Oauth2Provider()[oauth2x.StravaSource]
+	auth := oauth2x.Provider()[oauth2x.StravaSource]
 	srv := handler.NewStrava(sr, tr, transRepo, auth)
 	s := controller.NewStrava(srv)
 

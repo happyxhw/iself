@@ -14,9 +14,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/happyxhw/iself/component"
-
 	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/goredis"
 	"github.com/happyxhw/iself/pkg/log"
 	"github.com/happyxhw/iself/third_party"
 )
@@ -45,7 +44,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 }
 
 func initSession(e *echo.Echo) {
-	rdbStore := ex.NewStore(component.RDB(), viper.GetString("session.prefix"), []byte(viper.GetString("session.key")))
+	rdbStore := ex.NewStore(goredis.DefaultRDB(), viper.GetString("session.prefix"), []byte(viper.GetString("session.key")))
 	e.Use(session.MiddlewareWithConfig(session.Config{
 		Store: rdbStore,
 	}))
@@ -74,7 +73,7 @@ func initCsrf(e *echo.Echo) {
 }
 
 func initRateLimiter(e *echo.Echo) {
-	store, err := sredis.NewStoreWithOptions(component.RDB(), limiter.StoreOptions{
+	store, err := sredis.NewStoreWithOptions(goredis.DefaultRDB(), limiter.StoreOptions{
 		Prefix: viper.GetString("ratelimit.prefix"),
 	})
 	if err != nil {

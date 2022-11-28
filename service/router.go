@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"github.com/happyxhw/iself/component"
 	"github.com/happyxhw/iself/pkg/ex"
 	"github.com/happyxhw/iself/pkg/log"
 
@@ -55,7 +54,6 @@ func newRouter() *echo.Echo {
 	e.Validator = ex.NewValidator()
 	e.IPExtractor = echo.ExtractIPFromRealIPHeader(echo.TrustLinkLocal(true), echo.TrustPrivateNet(true))
 
-	component.InitComponent()
 	initGlobalMiddleware(e)
 
 	initRouter(e)

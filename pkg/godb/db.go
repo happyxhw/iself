@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"go.uber.org/zap"
@@ -21,12 +22,16 @@ var (
 	ErrUnknownDBType = errors.New("unknown db type")
 )
 
+var (
+	defaultDB *gorm.DB
+)
+
 // database type
-type dBType int8
+type dbType int8
 
 const (
 	// MysqlDB mysql
-	MysqlDB dBType = iota
+	MysqlDB dbType = iota
 	// PgDB postgresql
 	PgDB
 )
@@ -50,6 +55,25 @@ type Config struct {
 	Prometheus  bool
 }
 
+func InitDefaultDB(cfg *Config, t dbType) {
+	var err error
+	switch t {
+	case MysqlDB:
+		defaultDB, err = NewMysqlDB(cfg)
+	case PgDB:
+		defaultDB, err = NewPgDB(cfg)
+	default:
+		err = errors.New("unknown db type")
+	}
+	if err != nil {
+		log.Fatal("init db", zap.Error(err))
+	}
+}
+
+func DefaultDB() *gorm.DB {
+	return defaultDB
+}
+
 // NewMysqlDB return mysql db
 func NewMysqlDB(cfg *Config) (*gorm.DB, error) {
 	DB, err := createConnection(cfg, MysqlDB)
@@ -63,7 +87,7 @@ func NewPgDB(cfg *Config) (*gorm.DB, error) {
 }
 
 // create db connection
-func createConnection(cfg *Config, dbType dBType) (*gorm.DB, error) {
+func createConnection(cfg *Config, t dbType) (*gorm.DB, error) {
 	var db *gorm.DB
 	var err error
 
@@ -84,7 +108,7 @@ func createConnection(cfg *Config, dbType dBType) (*gorm.DB, error) {
 		slowThreshold := time.Duration(cfg.SlowThreshold) * time.Millisecond
 		c.Logger = newLogger(cfg.Logger, cfg.Level, slowThreshold, cfg.SQLLenThreshold)
 	}
-	switch dbType {
+	switch t {
 	case MysqlDB:
 		if port == 0 {
 			port = 3306

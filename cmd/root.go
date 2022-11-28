@@ -64,5 +64,6 @@ func start() {
 			Encoder: viper.GetString("log.encoder")},
 		zap.AddCallerSkip(1), zap.AddCaller())
 
+	service.Init()
 	service.Serve()
 }

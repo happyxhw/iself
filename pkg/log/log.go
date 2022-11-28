@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -13,24 +12,15 @@ import (
 	"github.com/happyxhw/iself/pkg/cx"
 )
 
-const (
-	defaultMaxAge     = time.Hour * 24 * 30 // 30 days
-	defaultRotateTime = time.Hour * 24      // 1 day
-)
-
 // Config for log
 type Config struct {
-	Level      string
-	Encoder    string
-	MaxAge     time.Duration `mapstructure:"max_age"`
-	RotateTime time.Duration `mapstructure:"rotate_time"`
+	Level   string
+	Encoder string
 }
 
 var defaultConfig = &Config{
-	Level:      "info",
-	Encoder:    "console",
-	MaxAge:     defaultMaxAge,
-	RotateTime: defaultRotateTime,
+	Level:   "info",
+	Encoder: "console",
 }
 
 // default appLogger

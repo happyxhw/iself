@@ -4,6 +4,16 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
+var ma *Mailer
+
+func InitDefaultMailer(cfg *Config) {
+	ma = NewMailer(cfg)
+}
+
+func DefaultMailer() *Mailer {
+	return ma
+}
+
 // Config for mailer
 type Config struct {
 	Host     string
