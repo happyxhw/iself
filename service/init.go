@@ -4,10 +4,14 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"github.com/happyxhw/iself/pkg/godb"
-	"github.com/happyxhw/iself/pkg/goredis"
-	"github.com/happyxhw/iself/pkg/log"
-	"github.com/happyxhw/iself/pkg/mailer"
+	"github.com/happyxhw/pkg/log"
+
+	"github.com/happyxhw/pkg/godb"
+
+	"github.com/happyxhw/pkg/goredis"
+
+	"github.com/happyxhw/pkg/mailer"
+
 	"github.com/happyxhw/iself/pkg/oauth2x"
 )
 

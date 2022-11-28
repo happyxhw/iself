@@ -3,11 +3,11 @@ package ex
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/happyxhw/iself/pkg/util"
+	"github.com/happyxhw/pkg/util"
 )
 
 // RequestID 获取并设置 request id
-func RequestID() echo.MiddlewareFunc {
+func SetRequestID() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
 			requestID := c.Request().Header.Get(echo.HeaderXRequestID)

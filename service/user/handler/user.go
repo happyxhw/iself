@@ -13,13 +13,17 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/happyxhw/pkg/log"
+
+	"github.com/happyxhw/pkg/aes"
+
+	"github.com/happyxhw/pkg/query"
+
+	"github.com/happyxhw/pkg/util"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/aes"
 	"github.com/happyxhw/iself/pkg/ex"
-	"github.com/happyxhw/iself/pkg/log"
 	"github.com/happyxhw/iself/pkg/oauth2x"
-	"github.com/happyxhw/iself/pkg/query"
-	"github.com/happyxhw/iself/pkg/util"
 	"github.com/happyxhw/iself/service/user/types"
 )
 

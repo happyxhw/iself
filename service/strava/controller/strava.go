@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/cx"
 	"github.com/happyxhw/iself/pkg/ex"
 	"github.com/happyxhw/iself/pkg/strava"
 	"github.com/happyxhw/iself/service/strava/handler"
@@ -34,7 +33,7 @@ func (s *Strava) GetActivity(c echo.Context) error {
 		return ex.ErrParam.Msg("wrong activity id")
 	}
 	uc := ex.GetUser(c)
-	result, err := s.srv.GetActivity(cx.NewTraceCx(c), activityID, uc.SourceID)
+	result, err := s.srv.GetActivity(ex.NewTraceCtx(c), activityID, uc.SourceID)
 	if err != nil {
 		return err
 	}
@@ -55,7 +54,7 @@ func (s *Strava) ListActivity(c echo.Context) error {
 		Type:  req.ActivityType,
 	}
 	uc := ex.GetUser(c)
-	results, err := s.srv.ListActivity(cx.NewTraceCx(c), uc.SourceID, &param)
+	results, err := s.srv.ListActivity(ex.NewTraceCtx(c), uc.SourceID, &param)
 	if err != nil {
 		return err
 	}
@@ -69,7 +68,7 @@ func (s *Strava) GetProgressStats(c echo.Context) error {
 		return err
 	}
 	uc := ex.GetUser(c)
-	result, err := s.srv.GetProgressStats(cx.NewTraceCx(c), uc.SourceID, &req)
+	result, err := s.srv.GetProgressStats(ex.NewTraceCtx(c), uc.SourceID, &req)
 	if err != nil {
 		return err
 	}
@@ -83,7 +82,7 @@ func (s *Strava) GetAggStats(c echo.Context) error {
 		return err
 	}
 	uc := ex.GetUser(c)
-	result, err := s.srv.GetAggStats(cx.NewTraceCx(c), uc.SourceID, &req)
+	result, err := s.srv.GetAggStats(ex.NewTraceCtx(c), uc.SourceID, &req)
 	if err != nil {
 		return err
 	}
@@ -97,7 +96,7 @@ func (s *Strava) CreateGoal(c echo.Context) error {
 		return err
 	}
 	uc := ex.GetUser(c)
-	err := s.srv.CreateGoal(cx.NewTraceCx(c), uc.SourceID, &req)
+	err := s.srv.CreateGoal(ex.NewTraceCtx(c), uc.SourceID, &req)
 	if err != nil {
 		return err
 	}
@@ -110,7 +109,7 @@ func (s *Strava) QueryGoal(c echo.Context) error {
 		return err
 	}
 	uc := ex.GetUser(c)
-	result, err := s.srv.GetGoals(cx.NewTraceCx(c), uc.SourceID, req.Type, req.Field)
+	result, err := s.srv.GetGoals(ex.NewTraceCtx(c), uc.SourceID, req.Type, req.Field)
 	if err != nil {
 		return err
 	}
@@ -123,7 +122,7 @@ func (s *Strava) UpdateGoal(c echo.Context) error {
 		return err
 	}
 	uc := ex.GetUser(c)
-	err := s.srv.UpdateGoal(cx.NewTraceCx(c), uc.SourceID, &req)
+	err := s.srv.UpdateGoal(ex.NewTraceCtx(c), uc.SourceID, &req)
 	if err != nil {
 		return err
 	}
@@ -136,7 +135,7 @@ func (s *Strava) DeleteGoal(c echo.Context) error {
 		return ex.ErrParam.Msg("goal id")
 	}
 	uc := ex.GetUser(c)
-	err := s.srv.DeleteGoal(cx.NewTraceCx(c), uc.SourceID, id)
+	err := s.srv.DeleteGoal(ex.NewTraceCtx(c), uc.SourceID, id)
 	if err != nil {
 		return err
 	}
@@ -149,7 +148,7 @@ func (s *Strava) Push(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	if emErr := s.srv.Push(cx.NewTraceCx(c), &req); emErr != nil {
+	if emErr := s.srv.Push(ex.NewTraceCtx(c), &req); emErr != nil {
 		return emErr
 	}
 	return ex.OK(c, nil)

@@ -6,11 +6,11 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.1
 	github.com/labstack/echo-contrib v0.11.0
-	github.com/labstack/echo/v4 v4.9.0
+	github.com/labstack/echo/v4 v4.9.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.10.1
 	github.com/ulule/limiter/v3 v3.9.0
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.23.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 )
 
@@ -44,7 +44,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
-	github.com/lib/pq v1.10.3 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -64,17 +63,21 @@ require (
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/net v0.0.0-20211203184738-4852103109b8 // indirect
-	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/driver/mysql v1.4.4 // indirect
+	gorm.io/driver/postgres v1.3.4 // indirect
+	gorm.io/plugin/prometheus v0.0.0-20220517015831-ca6bfaf20bf4 // indirect
 )
 
 require (
@@ -82,16 +85,12 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/golang/mock v1.6.0
-	github.com/gorilla/websocket v1.5.0
+	github.com/happyxhw/pkg v0.0.0-20221128142637-c1c52ea08149
 	github.com/jinzhu/copier v0.3.5
-	github.com/labstack/gommon v0.3.1
+	github.com/labstack/gommon v0.4.0
 	github.com/prometheus/client_golang v1.12.2
 	github.com/prometheus/common v0.32.1
-	github.com/stretchr/testify v1.7.0
-	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
-	gorm.io/driver/mysql v1.3.3
-	gorm.io/driver/postgres v1.3.4
-	gorm.io/gorm v1.23.4
-	gorm.io/plugin/prometheus v0.0.0-20220517015831-ca6bfaf20bf4
+	github.com/stretchr/testify v1.8.1
+	gorm.io/gorm v1.24.2
 	gorm.io/plugin/soft_delete v1.1.0
 )

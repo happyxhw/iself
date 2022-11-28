@@ -8,14 +8,18 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/happyxhw/pkg/log"
+
+	"github.com/happyxhw/pkg/query"
+
+	"github.com/happyxhw/pkg/trans"
+
+	"github.com/happyxhw/pkg/util"
+
 	"github.com/happyxhw/iself/model"
 	"github.com/happyxhw/iself/pkg/ex"
-	"github.com/happyxhw/iself/pkg/log"
 	"github.com/happyxhw/iself/pkg/oauth2x"
-	"github.com/happyxhw/iself/pkg/query"
 	"github.com/happyxhw/iself/pkg/strava"
-	"github.com/happyxhw/iself/pkg/trans"
-	"github.com/happyxhw/iself/pkg/util"
 	"github.com/happyxhw/iself/repo"
 	"github.com/happyxhw/iself/service/strava/types"
 )

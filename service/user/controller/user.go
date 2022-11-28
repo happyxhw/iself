@@ -10,11 +10,11 @@ import (
 	"github.com/labstack/gommon/random"
 	"github.com/spf13/viper"
 
+	"github.com/happyxhw/pkg/util"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/cx"
 	"github.com/happyxhw/iself/pkg/ex"
 	"github.com/happyxhw/iself/pkg/oauth2x"
-	"github.com/happyxhw/iself/pkg/util"
 	"github.com/happyxhw/iself/service/user/handler"
 	"github.com/happyxhw/iself/service/user/types"
 )
@@ -54,7 +54,7 @@ func NewUser(srv *handler.User, oauth2xProvider map[string]oauth2x.Oauth2x) *Use
 
 func (u *User) Info(c echo.Context) error {
 	uc := ex.GetUser(c)
-	r, err := u.srv.Info(cx.NewTraceCx(c), uc.ID, uc.SourceID, uc.Source)
+	r, err := u.srv.Info(ex.NewTraceCtx(c), uc.ID, uc.SourceID, uc.Source)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (u *User) SignUp(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.SignUp(cx.NewTraceCx(c), &req)
+	err := u.srv.SignUp(ex.NewTraceCtx(c), &req)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (u *User) SignIn(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	user, err := u.srv.SignIn(cx.NewTraceCx(c), &req)
+	user, err := u.srv.SignIn(ex.NewTraceCtx(c), &req)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func (u *User) ChangePassword(c echo.Context) error {
 		return ex.ErrForbidden
 	}
 	id, _ := sess.Values["id"].(float64)
-	err := u.srv.ChangePassword(cx.NewTraceCx(c), int64(id), &req)
+	err := u.srv.ChangePassword(ex.NewTraceCtx(c), int64(id), &req)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (u *User) ResetPassword(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.ResetPassword(cx.NewTraceCx(c), &req)
+	err := u.srv.ResetPassword(ex.NewTraceCtx(c), &req)
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (u *User) Active(c echo.Context) error {
 	if err := ex.Bind(c, &req); err != nil {
 		return err
 	}
-	err := u.srv.Active(cx.NewTraceCx(c), req.Token)
+	err := u.srv.Active(ex.NewTraceCtx(c), req.Token)
 	if err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (u *User) SendEmail(c echo.Context) error {
 	if req.Type == handler.ResetEmail {
 		url = u.resetURL
 	}
-	err := u.srv.SendEmail(cx.NewTraceCx(c), req.Email, req.Type, url)
+	err := u.srv.SendEmail(ex.NewTraceCtx(c), req.Email, req.Type, url)
 	if err != nil {
 		return err
 	}
@@ -222,7 +222,7 @@ func (u *User) Oauth2Callback(c echo.Context) error {
 	}
 	_ = sess.Save(c.Request(), c.Response())
 
-	user, err := u.srv.SignInByOauth2(cx.NewTraceCx(c), source, req.Code, cli)
+	user, err := u.srv.SignInByOauth2(ex.NewTraceCtx(c), source, req.Code, cli)
 	if err != nil {
 		return err
 	}

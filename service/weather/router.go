@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/pkg/log"
 )
 
 // InitRouter 初始化用户路由

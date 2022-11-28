@@ -14,9 +14,11 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/happyxhw/pkg/log"
+
+	"github.com/happyxhw/pkg/goredis"
+
 	"github.com/happyxhw/iself/pkg/ex"
-	"github.com/happyxhw/iself/pkg/goredis"
-	"github.com/happyxhw/iself/pkg/log"
 	"github.com/happyxhw/iself/third_party"
 )
 
@@ -32,7 +34,7 @@ func initGlobalMiddleware(e *echo.Echo) {
 		e.Use(ex.Recover())
 	}
 	// request id
-	e.Use(ex.RequestID())
+	e.Use(ex.SetRequestID())
 	// access log
 	e.Use(ex.Logger(apiLogger))
 

@@ -11,8 +11,9 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
+	"github.com/happyxhw/pkg/log"
+
 	"github.com/happyxhw/iself/pkg/ex"
-	"github.com/happyxhw/iself/pkg/log"
 
 	stravaRouter "github.com/happyxhw/iself/service/strava"
 	userRouter "github.com/happyxhw/iself/service/user"

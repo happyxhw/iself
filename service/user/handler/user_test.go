@@ -11,9 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 
+	"github.com/happyxhw/pkg/query"
+
+	"github.com/happyxhw/pkg/util"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/query"
-	"github.com/happyxhw/iself/pkg/util"
 	"github.com/happyxhw/iself/service/user/handler/mocks"
 	"github.com/happyxhw/iself/service/user/types"
 )

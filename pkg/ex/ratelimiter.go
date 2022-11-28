@@ -5,8 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/ulule/limiter/v3"
-
-	"github.com/happyxhw/iself/pkg/cx"
 )
 
 // IPRateLimit by ip
@@ -17,7 +15,7 @@ func IPRateLimit(store limiter.Store, rate limiter.Rate) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
 			ip := c.RealIP()
-			limiterCtx, err := ipRateLimiter.Get(cx.NewTraceCx(c), ip)
+			limiterCtx, err := ipRateLimiter.Get(NewTraceCtx(c), ip)
 			if err != nil {
 				return ErrRedis.Wrap(err)
 			}

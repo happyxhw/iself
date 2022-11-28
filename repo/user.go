@@ -5,9 +5,11 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/happyxhw/pkg/query"
+
+	"github.com/happyxhw/pkg/trans"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/query"
-	"github.com/happyxhw/iself/pkg/trans"
 )
 
 type UserRepo struct {

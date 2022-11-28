@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/plugin/soft_delete"
 
-	"github.com/happyxhw/iself/pkg/query"
+	"github.com/happyxhw/pkg/query"
 )
 
 // User model
