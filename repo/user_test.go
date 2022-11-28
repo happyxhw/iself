@@ -8,10 +8,13 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/happyxhw/pkg/mymock"
+
+	"github.com/happyxhw/pkg/query"
+
+	"github.com/happyxhw/pkg/util"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/mymock"
-	"github.com/happyxhw/iself/pkg/query"
-	"github.com/happyxhw/iself/pkg/util"
 )
 
 var mockUser = model.User{

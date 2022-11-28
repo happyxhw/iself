@@ -13,13 +13,17 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/happyxhw/pkg/log"
+
+	"github.com/happyxhw/pkg/aes"
+
+	"github.com/happyxhw/pkg/query"
+
+	"github.com/happyxhw/pkg/util"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/aes"
 	"github.com/happyxhw/iself/pkg/ex"
-	"github.com/happyxhw/iself/pkg/log"
 	"github.com/happyxhw/iself/pkg/oauth2x"
-	"github.com/happyxhw/iself/pkg/query"
-	"github.com/happyxhw/iself/pkg/util"
 	"github.com/happyxhw/iself/service/user/types"
 )
 
@@ -85,7 +89,7 @@ func (u *User) SignUp(ctx context.Context, req *types.SignUpReq) error {
 	err = u.sendEmail(ctx, req.Email, ActiveEmail, req.ActiveURL)
 	// 忽略邮件发送错误
 	if err != nil {
-		userLogger.Error("send active email", zap.Error(err), log.Ctx(ctx))
+		userLogger.Error("send active email", zap.Error(err), log.CTX(ctx))
 	}
 
 	return nil

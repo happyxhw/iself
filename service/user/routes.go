@@ -4,8 +4,14 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
 
-	"github.com/happyxhw/iself/component"
+	"github.com/happyxhw/pkg/godb"
+
+	"github.com/happyxhw/pkg/goredis"
+
+	"github.com/happyxhw/pkg/mailer"
+
 	"github.com/happyxhw/iself/pkg/ex"
+	"github.com/happyxhw/iself/pkg/oauth2x"
 	"github.com/happyxhw/iself/repo"
 	"github.com/happyxhw/iself/service/user/controller"
 	"github.com/happyxhw/iself/service/user/handler"
@@ -17,16 +23,15 @@ func InitRouter(e *echo.Echo) {
 	ug := e.Group("/api/user")
 	ug.Use(ex.AuthRequired())
 
-	cacher := repo.NewCacher(component.RDB())
-	mailer := component.Mailer()
-	userRepo := repo.NewUserRepo(component.DB())
+	cacher := repo.NewCacher(goredis.DefaultRDB())
+	userRepo := repo.NewUserRepo(godb.DefaultDB())
 	tokenRepo := repo.NewTokenRepo(cacher)
 	aesKey := viper.GetString("secure.key")
 
 	srv := handler.NewUserSrv(
-		userRepo, tokenRepo, mailer, cacher, []byte(aesKey),
+		userRepo, tokenRepo, mailer.DefaultMailer(), cacher, []byte(aesKey),
 	)
-	u := controller.NewUser(srv, component.Oauth2Provider())
+	u := controller.NewUser(srv, oauth2x.Provider())
 
 	router(ag, ug, u)
 }

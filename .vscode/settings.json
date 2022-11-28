@@ -3,7 +3,9 @@
     "cSpell.words": [
         "Heartrate",
         "Latlng",
-        "mymock"
+        "mymock",
+        "Polyline",
+        "virtualride"
     ],
     "gopls": {
         "formatting.local": "github.com/happyxhw/iself"

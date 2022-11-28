@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	model "github.com/happyxhw/iself/model"
-	query "github.com/happyxhw/iself/pkg/query"
+	query "github.com/happyxhw/pkg/query"
 	gomock "github.com/golang/mock/gomock"
 )
 

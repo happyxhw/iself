@@ -3,8 +3,8 @@ CREATE TABLE strava_activity_detail
 (
     id                   bigint                   NOT NULL PRIMARY KEY,
     athlete_id           bigint                   NOT NULL,
-    "name"                 varchar(128)             NOT NULL,
-    "type"                 varchar(32)              NOT NULL,
+    "name"               varchar(128)             NOT NULL,
+    "type"               varchar(32)              NOT NULL,
     distance             float                    NOT NULL DEFAULT 0.0,
     moving_time          integer                  NOT NULL DEFAULT 0,
     elapsed_time         integer                  NOT NULL DEFAULT 0,

@@ -9,7 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"github.com/happyxhw/iself/pkg/log"
+	"github.com/happyxhw/pkg/log"
+
 	"github.com/happyxhw/iself/service"
 )
 
@@ -64,5 +65,6 @@ func start() {
 			Encoder: viper.GetString("log.encoder")},
 		zap.AddCallerSkip(1), zap.AddCaller())
 
+	service.Init()
 	service.Serve()
 }

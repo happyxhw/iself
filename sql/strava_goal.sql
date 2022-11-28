@@ -3,10 +3,10 @@ CREATE TABLE strava_goal
 (
     id         bigserial   NOT NULL PRIMARY KEY,
     athlete_id bigint      NOT NULL,
-    "type"       varchar(10) NOT NULL,
+    "type"     varchar(10) NOT NULL,
     field      varchar(10) NOT NULL,
     freq       varchar(10) NOT NULL,
-    "value"      float       NOT NULL,
+    "value"    float       NOT NULL,
     created_at timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at bigint      NOT NULL DEFAULT 0,

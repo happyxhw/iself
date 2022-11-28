@@ -6,9 +6,11 @@ import (
 
 	"golang.org/x/oauth2"
 
+	"github.com/happyxhw/pkg/log"
+
+	"github.com/happyxhw/pkg/query"
+
 	"github.com/happyxhw/iself/model"
-	"github.com/happyxhw/iself/pkg/log"
-	"github.com/happyxhw/iself/pkg/query"
 	"github.com/happyxhw/iself/repo"
 )
 
