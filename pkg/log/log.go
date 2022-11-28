@@ -12,6 +12,8 @@ import (
 	"github.com/happyxhw/iself/pkg/cx"
 )
 
+
+
 // Config for log
 type Config struct {
 	Level   string
@@ -119,6 +121,6 @@ func Sync() {
 	_ = appLogger.Sync()
 }
 
-func Ctx(ctx context.Context) zap.Field {
+func CTX(ctx context.Context) zap.Field {
 	return zap.String(echo.HeaderXRequestID, cx.RequestID(ctx))
 }

@@ -85,7 +85,7 @@ func (u *User) SignUp(ctx context.Context, req *types.SignUpReq) error {
 	err = u.sendEmail(ctx, req.Email, ActiveEmail, req.ActiveURL)
 	// 忽略邮件发送错误
 	if err != nil {
-		userLogger.Error("send active email", zap.Error(err), log.Ctx(ctx))
+		userLogger.Error("send active email", zap.Error(err), log.CTX(ctx))
 	}
 
 	return nil

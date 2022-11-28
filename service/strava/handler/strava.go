@@ -204,7 +204,7 @@ func (s *Strava) Push(ctx context.Context, event *strava.SubscriptionEvent) erro
 	if data == nil || data.Status != int(model.EventProcessedStatus) {
 		err = s.push(ctx, event)
 		if err != nil {
-			log.Error("strava push", zap.Int64("object_id", event.ObjectID), log.Ctx(ctx))
+			log.Error("strava push", zap.Int64("object_id", event.ObjectID), log.CTX(ctx))
 			return err
 		}
 	}
