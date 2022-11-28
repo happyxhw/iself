@@ -85,7 +85,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/golang/mock v1.6.0
-	github.com/happyxhw/pkg v0.0.0-20221128142637-c1c52ea08149
+	github.com/happyxhw/pkg v0.0.0-20221128150813-e1dafcfc1054
 	github.com/jinzhu/copier v0.3.5
 	github.com/labstack/gommon v0.4.0
 	github.com/prometheus/client_golang v1.12.2
