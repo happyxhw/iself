@@ -3,9 +3,8 @@ package ex
 import (
 	"context"
 
-	"github.com/labstack/echo/v4"
-
 	"github.com/happyxhw/pkg/cx"
+	"github.com/labstack/echo/v4"
 )
 
 func NewTraceCtx(c echo.Context) context.Context {

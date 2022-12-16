@@ -255,6 +255,10 @@ github.com/happyxhw/pkg v0.0.0-20221128142637-c1c52ea08149 h1:mMm6hLgfu8iibVCkKa
 github.com/happyxhw/pkg v0.0.0-20221128142637-c1c52ea08149/go.mod h1:Wu0zOT4GcFtGJACVhOJOoD+5Gqxyn0gA7Sucs7M1PGw=
 github.com/happyxhw/pkg v0.0.0-20221128150813-e1dafcfc1054 h1:6K9faMiP0Elnv2vtxd85A8saa0G3pjXTZEqngCPTR7I=
 github.com/happyxhw/pkg v0.0.0-20221128150813-e1dafcfc1054/go.mod h1:Wu0zOT4GcFtGJACVhOJOoD+5Gqxyn0gA7Sucs7M1PGw=
+github.com/happyxhw/pkg v0.0.0-20221215052307-e39fc6fc491f h1:vdviks9PC3TOPazJVYA33EbNkjN2CF6+JIhhKBrmPz0=
+github.com/happyxhw/pkg v0.0.0-20221215052307-e39fc6fc491f/go.mod h1:Wu0zOT4GcFtGJACVhOJOoD+5Gqxyn0gA7Sucs7M1PGw=
+github.com/happyxhw/pkg v0.0.0-20221215052920-e5a2a7e4c6cc h1:7Cc0gTVCjm8Hk65OptaGoghkbwZz/RZ0eDjzCoeNQ7Y=
+github.com/happyxhw/pkg v0.0.0-20221215052920-e5a2a7e4c6cc/go.mod h1:Wu0zOT4GcFtGJACVhOJOoD+5Gqxyn0gA7Sucs7M1PGw=
 github.com/hashicorp/consul/api v1.1.0/go.mod h1:VmuI/Lkw1nC05EYQWNKwWGbkg+FbDBtguAZLlVdkD9Q=
 github.com/hashicorp/consul/api v1.3.0/go.mod h1:MmDNSzIMUjNpY/mQ398R4bk2FnqQLoPndWW5VkKPlCE=
 github.com/hashicorp/consul/sdk v0.1.1/go.mod h1:VKf9jXwCTEY1QZP2MOLRhb5i/I/ssyNV1vwHyQBF0x8=

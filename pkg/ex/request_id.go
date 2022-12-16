@@ -1,9 +1,8 @@
 package ex
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"github.com/happyxhw/pkg/util"
+	"github.com/labstack/echo/v4"
 )
 
 // RequestID 获取并设置 request id

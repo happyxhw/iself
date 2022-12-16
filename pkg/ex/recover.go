@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/happyxhw/pkg/log"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
-
-	"github.com/happyxhw/pkg/log"
 )
 
 type (

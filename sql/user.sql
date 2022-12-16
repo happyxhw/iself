@@ -19,7 +19,7 @@ CREATE table "user"
     deleted_at bigint        NOT NULL   DEFAULT 0,
 
     UNIQUE (email, deleted_at)
-);1991&+1shaha
+);
 
 CREATE INDEX user_source ON "user" (source, source_id);
 
