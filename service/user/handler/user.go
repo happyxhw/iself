@@ -10,16 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/happyxhw/pkg/aes"
+	"github.com/happyxhw/pkg/log"
+	"github.com/happyxhw/pkg/query"
+	"github.com/happyxhw/pkg/util"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
-
-	"github.com/happyxhw/pkg/log"
-
-	"github.com/happyxhw/pkg/aes"
-
-	"github.com/happyxhw/pkg/query"
-
-	"github.com/happyxhw/pkg/util"
 
 	"github.com/happyxhw/iself/model"
 	"github.com/happyxhw/iself/pkg/ex"

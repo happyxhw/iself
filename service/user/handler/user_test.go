@@ -7,13 +7,11 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/happyxhw/pkg/query"
+	"github.com/happyxhw/pkg/util"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
-
-	"github.com/happyxhw/pkg/query"
-
-	"github.com/happyxhw/pkg/util"
 
 	"github.com/happyxhw/iself/model"
 	"github.com/happyxhw/iself/service/user/handler/mocks"

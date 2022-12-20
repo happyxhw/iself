@@ -1,13 +1,10 @@
 package strava
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"github.com/happyxhw/pkg/godb"
-
 	"github.com/happyxhw/pkg/goredis"
-
 	"github.com/happyxhw/pkg/trans"
+	"github.com/labstack/echo/v4"
 
 	"github.com/happyxhw/iself/pkg/ex"
 	"github.com/happyxhw/iself/pkg/oauth2x"

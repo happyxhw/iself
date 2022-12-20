@@ -6,15 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/happyxhw/pkg/log"
-
 	"github.com/happyxhw/pkg/query"
-
 	"github.com/happyxhw/pkg/trans"
-
 	"github.com/happyxhw/pkg/util"
+	"go.uber.org/zap"
 
 	"github.com/happyxhw/iself/model"
 	"github.com/happyxhw/iself/pkg/ex"

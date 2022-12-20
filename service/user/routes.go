@@ -1,14 +1,11 @@
 package user
 
 import (
+	"github.com/happyxhw/pkg/godb"
+	"github.com/happyxhw/pkg/goredis"
+	"github.com/happyxhw/pkg/mailer"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
-
-	"github.com/happyxhw/pkg/godb"
-
-	"github.com/happyxhw/pkg/goredis"
-
-	"github.com/happyxhw/pkg/mailer"
 
 	"github.com/happyxhw/iself/pkg/ex"
 	"github.com/happyxhw/iself/pkg/oauth2x"

@@ -5,11 +5,9 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/stretchr/testify/require"
-
 	"github.com/happyxhw/pkg/mymock"
-
 	"github.com/happyxhw/pkg/query"
+	"github.com/stretchr/testify/require"
 
 	"github.com/happyxhw/iself/model"
 )

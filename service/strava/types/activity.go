@@ -1,9 +1,8 @@
 package types
 
 import (
-	"github.com/jinzhu/copier"
-
 	"github.com/happyxhw/pkg/query"
+	"github.com/jinzhu/copier"
 
 	"github.com/happyxhw/iself/model"
 	"github.com/happyxhw/iself/pkg/strava"

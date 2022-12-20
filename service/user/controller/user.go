@@ -5,12 +5,11 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
+	"github.com/happyxhw/pkg/util"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/random"
 	"github.com/spf13/viper"
-
-	"github.com/happyxhw/pkg/util"
 
 	"github.com/happyxhw/iself/model"
 	"github.com/happyxhw/iself/pkg/ex"

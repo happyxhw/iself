@@ -5,11 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/happyxhw/pkg/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-
-	"github.com/happyxhw/pkg/log"
 
 	"github.com/happyxhw/iself/service"
 )

@@ -3,9 +3,8 @@ package model
 import (
 	"time"
 
-	"gorm.io/plugin/soft_delete"
-
 	"github.com/happyxhw/pkg/query"
+	"gorm.io/plugin/soft_delete"
 )
 
 // User model

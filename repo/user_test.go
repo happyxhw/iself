@@ -6,13 +6,10 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/stretchr/testify/require"
-
 	"github.com/happyxhw/pkg/mymock"
-
 	"github.com/happyxhw/pkg/query"
-
 	"github.com/happyxhw/pkg/util"
+	"github.com/stretchr/testify/require"
 
 	"github.com/happyxhw/iself/model"
 )

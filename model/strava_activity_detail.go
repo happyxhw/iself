@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/happyxhw/pkg/query"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
-
-	"github.com/happyxhw/pkg/query"
 
 	"github.com/happyxhw/iself/pkg/strava"
 )

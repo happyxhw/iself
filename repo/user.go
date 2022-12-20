@@ -3,11 +3,9 @@ package repo
 import (
 	"context"
 
-	"gorm.io/gorm"
-
 	"github.com/happyxhw/pkg/query"
-
 	"github.com/happyxhw/pkg/trans"
+	"gorm.io/gorm"
 
 	"github.com/happyxhw/iself/model"
 )
